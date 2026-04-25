@@ -1,0 +1,26 @@
+# Ignora le cartelle temporanee di Python
+__pycache__/
+*.pyc
+
+# Ignora il database SQLite (non vogliamo pubblicare i log e le password hashate!)
+*.db
+monitor.db
+monitor.db-journal
+monitor.db-shm
+monitor.db-wal
+
+# Ignora i file di configurazione reali (pubblicherai solo i .example.json)
+config.json
+clients.json
+
+# Ignora i file dati scaricati in automatico (sono grandi e dinamici)
+dmrid.dat
+nxdn.csv
+telemetry_cache.json
+
+# Ignora log di sistema eventuali
+*.log
+
+# Ignora le configurazioni reali dell'agente remoto
+*.ini
+!*.example.ini

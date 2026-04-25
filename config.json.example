@@ -1,0 +1,28 @@
+{
+    "mqtt": {
+        "broker": "your_mqtt_broker_address",
+        "port": 1883,
+        "user": "your_username",
+        "password": "your_password"
+    },
+    "web_admin": {
+        "default_user": "admin",
+        "default_pass": "admin123"
+    },
+    "webpush": {
+        "vapid_public_key": "INSERT_GENERATED_PUBLIC_KEY_HERE",
+        "vapid_private_key": "INSERT_GENERATED_PRIVATE_KEY_HERE",
+        "vapid_claim_email": "mailto:your@email.com"
+    },
+    "ui": {
+        "profileA_Name": "PROFILE A",
+        "profileA_Color": "#3b82f6",
+        "profileB_Name": "PROFILE B",
+        "profileB_Color": "#eab308"
+    },
+    "update_schedule": "03:00",
+    "id_urls": {
+        "dmr": "https://radioid.net/static/dmrid.dat",
+        "nxdn": "https://radioid.net/static/nxdn.csv"
+    }
+}

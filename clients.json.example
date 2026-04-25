@@ -1,0 +1,6 @@
+[
+    {"_comment": "Enter each repeater/node you want to control. The ID must match the MQTT topic"},
+    { "id": "repeater1", "name": "NAME 1" },
+    { "id": "repeater2", "name": "NAME 2" },
+    { "id": "repeater3", "name": "NAME 3" }
+]

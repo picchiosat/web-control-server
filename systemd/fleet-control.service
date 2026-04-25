@@ -1,0 +1,19 @@
+[Unit]
+Description=Fleet Control Console - Central Hub
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/web-control
+ExecStart=/usr/local/bin/gunicorn -k "geventwebsocket.gunicorn.workers.GeventWebSocketWorker" -w 1 --graceful-timeout 2 --bind 0.0.0.0:9000 app:app
+TimeoutStopSec=3
+Restart=always
+RestartSec=5
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=fleet-console
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,8 @@
+Flask
+Flask-SocketIO
+Werkzeug
+pywebpush
+paho-mqtt
+gunicorn
+gevent
+gevent-websocket
