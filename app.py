@@ -161,9 +161,15 @@ active_calls = {}
 with open(CONFIG_PATH) as f: config = json.load(f)
 
 # --- MQTT CALLBACKS ---
+mqtt_connected_status = False
+
 def on_connect(client, userdata, flags, reason_code, properties=None):
+    global mqtt_connected_status
     if reason_code == 0:
+        mqtt_connected_status = True
         logger.info("✅ Successfully connected to MQTT Broker! Subscribing to topics...")
+        # Invia lo stato Online ai client web
+        socketio.emit('mqtt_status', {'connected': True})
         client.subscribe([
             ("servizi/+/stat", 0), 
             ("dmr-gateway/+/json", 0), 
@@ -177,10 +183,21 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
             ("data/#", 0)
         ])
     else:
+        mqtt_connected_status = False
+        socketio.emit('mqtt_status', {'connected': False})
         logger.error(f"❌ MQTT Connection Error. Reason code: {reason_code}")
 
 def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None):
+    global mqtt_connected_status
+    mqtt_connected_status = False
+    # Invia lo stato Offline ai client web
+    socketio.emit('mqtt_status', {'connected': False})
     logger.warning(f"⚠️ MQTT Disconnection detected! Reason code: {reason_code}. Attempting automatic reconnection...")
+
+# Quando un nuovo utente apre la pagina web, inviagli subito lo stato attuale
+@socketio.on('connect')
+def handle_connect():
+    emit('mqtt_status', {'connected': mqtt_connected_status})
 
 def on_message(client, userdata, msg):
     try:

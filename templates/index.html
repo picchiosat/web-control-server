@@ -70,6 +70,12 @@
         .actions { display: none; gap: 8px; flex-wrap: wrap; margin-top: auto; }
         .btn-cmd { flex: 1; padding: 8px 10px; border: 1px solid var(--border-color); background: #010409 !important; border-radius: 3px; font-weight: 600; font-size: 0.75rem; cursor: pointer; color: var(--text-main) !important; font-family: 'JetBrains Mono', monospace; transition: border-color 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 5px; box-shadow: none !important; }
         .btn-cmd:hover { border-color: var(--text-main); }
+  
+        /* Badge di stato MQTT */
+        .mqtt-badge { padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; transition: all 0.3s ease; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; height: 30px;}
+        .mqtt-online { background: rgba(46, 160, 67, 0.1); color: var(--success); border-color: var(--success); }
+        .mqtt-offline { background: rgba(218, 54, 51, 0.1); color: var(--danger); border-color: var(--danger); animation: pulse-red 2s infinite; }
+        @keyframes pulse-red { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         
         /* Tabella LastHeard */
         .table-container { background: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color); overflow: hidden; max-height: 400px; overflow-y: auto; margin: 0 20px 40px 20px; box-shadow: none; }
@@ -125,6 +131,8 @@
     <div id="top-bar">
         <div class="title-brand">FLEET CONTROL CONSOLE</div>
         <div style="display: flex; align-items: center; gap: 12px;">
+            <span id="mqtt-badge" class="mqtt-badge mqtt-offline">MQTT: CHECKING...</span>
+            
             <button class="theme-switch" id="lang-btn" onclick="toggleLang()" data-i18n-title="ttLang">🇮🇹 ITA</button>
             <button class="theme-switch" id="push-btn" onclick="subscribeToPush()">🔔 PUSH</button>
             <div id="auth-container" style="display:flex; align-items:center; gap:8px;"></div>
@@ -1200,6 +1208,20 @@
 
     // --- MOTORE WEBSOCKET REAL-TIME ---
     const socket = io();
+
+   // NUOVO LISTENER PER LO STATO MQTT
+    socket.on('mqtt_status', function(data) {
+        const badge = document.getElementById('mqtt-badge');
+        if (badge) {
+            if (data.connected) {
+                badge.innerText = "MQTT: ONLINE";
+                badge.className = "mqtt-badge mqtt-online";
+            } else {
+                badge.innerText = "MQTT: OFFLINE";
+                badge.className = "mqtt-badge mqtt-offline";
+            }
+        }
+    });
 
     socket.on('connect', () => {
         console.log("🟢 Connesso al server via WebSocket in tempo reale!");
