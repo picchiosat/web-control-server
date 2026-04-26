@@ -6,13 +6,21 @@
 1. PRE-REQUISITES (CRITICAL)
 ------------------------------------------------------------
 Before installing Python dependencies, you must install 
-system compilers and development libraries.
+system compilers, development libraries, and pip/venv tools.
 
 Debian/Ubuntu:
    sudo apt update
+   sudo apt install build-essential python3-dev libssl-dev libffi-dev python3-pip python3-venv
 
-   sudo apt install build-essential python3-dev python3-pip libssl-dev libffi-dev python3-setuptools python3-wheel
+Create and activate a virtual environment (CRITICAL on Debian 12+):
+   cd /opt/web-control-server
+   python3 -m venv venv
+   source venv/bin/activate
 
+Upgrade base pip tools (Must be done INSIDE the venv):
+   pip install --upgrade pip setuptools wheel
+
+Install project requirements:
    pip install -r requirements.txt
 
 ------------------------------------------------------------
@@ -43,6 +51,9 @@ They will NOT work over standard HTTP.
 ------------------------------------------------------------
 4. RUNNING AS A SERVICE (SYSTEMD)
 ------------------------------------------------------------
+NOTE: Make sure your fleet-console.service file points to 
+the executable inside the venv (e.g., ExecStart=/opt/web-control-server/venv/bin/gunicorn ...)
+
 Configuration:
 1. Copy .service file to '/etc/systemd/system/':
    sudo cp fleet-console.service /etc/systemd/system/
@@ -51,26 +62,29 @@ Configuration:
 4. Start service:  sudo systemctl start fleet-console
 
 ============================================================
-       GUIDA ALL'INSTALLAZIONE - SERVER
+       GUIDA ALL'INSTALLAZIONE - SERVER (ITALIANO)
 ============================================================
 
 ------------------------------------------------------------
 1. REQUISITI PRELIMINARI (CRITICI)
 ------------------------------------------------------------
 Prima di installare le dipendenze Python, è necessario 
-installare i compilatori di sistema. Senza questi, 
-l'installazione di 'gevent' fallirà su VPS vergini.
+installare i compilatori di sistema e gli strumenti per pip/venv.
+Senza questi, l'installazione fallirà su VPS vergini.
 
 Esegui su Debian/Ubuntu:
    sudo apt update
-   sudo apt install build-essential python3-dev libssl-dev libffi-dev
+   sudo apt install build-essential python3-dev libssl-dev libffi-dev python3-pip python3-venv
 
-Aggiorna gli strumenti di base di pip:
-   pip install --upgrade pip setuptools wheel
-
-Crea un ambiente virtuale (consigliato):
+Crea e attiva un ambiente virtuale (FONDAMENTALE su Debian 12+):
+   cd /opt/web-control-server
    python3 -m venv venv
    source venv/bin/activate
+
+Aggiorna gli strumenti di base di pip (DA FARE DENTRO il venv):
+   pip install --upgrade pip setuptools wheel
+
+Installa i requisiti del progetto:
    pip install -r requirements.txt
 
 ------------------------------------------------------------
@@ -87,7 +101,6 @@ Passaggi:
 3. GENERAZIONE CHIAVI VAPID
 ------------------------------------------------------------
 ⚠️ ATTENZIONE: Le notifiche push richiedono HTTPS.
-
 1. Vai su https://vapidkeys.com/ e genera le chiavi.
 2. Copia 'Public Key' e 'Private Key' nel 'config.json'.
 3. Imposta 'vapid_claim_email' (es. "mailto:tua@email.com").
@@ -95,6 +108,9 @@ Passaggi:
 ------------------------------------------------------------
 4. ESECUZIONE COME SERVIZIO
 ------------------------------------------------------------
+NOTA BENE: Assicurati che il file fleet-console.service 
+punti all'eseguibile dentro il venv (es: ExecStart=/opt/web-control-server/venv/bin/gunicorn ...)
+
 1. sudo cp fleet-console.service /etc/systemd/system/
 2. sudo systemctl daemon-reload
 3. sudo systemctl enable fleet-console
