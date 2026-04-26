@@ -12,10 +12,23 @@ from pywebpush import webpush, WebPushException
 from logging.handlers import RotatingFileHandler
 from flask_socketio import SocketIO, emit
 
+# --- DYNAMIC BASE PATH ---
+# Calcola automaticamente la directory esatta in cui si trova questo file (app.py)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# --- PATHS ---
+DB_PATH = os.path.join(BASE_DIR, 'monitor.db')
+CACHE_FILE = os.path.join(BASE_DIR, 'telemetry_cache.json')
+CONFIG_PATH = os.path.join(BASE_DIR, 'config.json')
+DMR_IDS_PATH = os.path.join(BASE_DIR, 'dmrid.dat')
+NXDN_IDS_PATH = os.path.join(BASE_DIR, 'nxdn.csv')
+CLIENTS_PATH = os.path.join(BASE_DIR, 'clients.json')
+LOG_FILE = os.path.join(BASE_DIR, 'fleet_console.log')
+
 # --- LOGGING CONFIGURATION ---
 logging.basicConfig(
     handlers=[
-        RotatingFileHandler('/opt/web-control/fleet_console.log', maxBytes=10000000, backupCount=3),
+        RotatingFileHandler(LOG_FILE, maxBytes=10000000, backupCount=3),
         logging.StreamHandler()
     ],
     level=logging.INFO,
@@ -25,14 +38,6 @@ logging.basicConfig(
 logger = logging.getLogger("FleetHub")
 # Silence HTTP request spam (GET /api/states 200 OK)
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
-
-# --- PATHS ---
-DB_PATH = '/opt/web-control/monitor.db'
-CACHE_FILE = '/opt/web-control/telemetry_cache.json'
-CONFIG_PATH = '/opt/web-control/config.json'
-DMR_IDS_PATH = '/opt/web-control/dmrid.dat'
-NXDN_IDS_PATH = '/opt/web-control/nxdn.csv'
-CLIENTS_PATH = '/opt/web-control/clients.json'
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
