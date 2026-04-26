@@ -6,32 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fleet Control Console</title>
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#0d1117">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/icon-512.png">
     <meta name="apple-mobile-web-app-title" content="Fleet C2">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-<style>
+    <style>
         /* --- TEMA NOC (Network Operations Center) --- */
         :root { 
             --primary: #2f81f7; --success: #2ea043; --danger: #da3633; --accent: #a371f7; 
-            --bg-gradient: #0d1117; /* Sfondo nero/grigio profondissimo */
-            --card-bg: #161b22;     /* Sfondo grigio antracite per i pannelli */
-            --border-color: #30363d;/* Bordi netti e sottili */
-            --text-main: #c9d1d9;   /* Bianco attenuato anti-affaticamento */
-            --text-muted: #8b949e;  /* Grigio tecnico per label */
+            --bg-gradient: #0d1117; 
+            --card-bg: #161b22;     
+            --border-color: #30363d;
+            --text-main: #c9d1d9;   
+            --text-muted: #8b949e;  
             --topbar-bg: #161b22;
-        }
-        
-        /* Modalità scura "pura" se il toggle viene premuto */
-        body.dark-mode { 
-            --bg-gradient: #010409; --card-bg: #0d1117; --border-color: #21262d;
-            --text-main: #f0f6fc; --topbar-bg: #0d1117;
         }
 
         * { box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-gradient); margin: 0; padding: 0; color: var(--text-main); transition: background-color 0.3s; min-height: 100vh; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-gradient); margin: 0; padding: 0; color: var(--text-main); min-height: 100vh; }
         
         /* Barra superiore squadrata e tecnica */
         #top-bar-container { position: sticky; top: 15px; z-index: 100; padding: 0 20px; display: flex; justify-content: center; }
@@ -43,9 +37,8 @@
         
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; max-width: 1400px; margin: 30px auto; padding: 0 20px; }
         
-        /* Pannelli Ripetitori - Zero ombre, bordi netti */
-        .card { background: var(--card-bg) !important; border-radius: 4px; padding: 20px; border: 1px solid var(--border-color); border-top: 4px solid var(--border-color) !important; display: flex; flex-direction: column; box-shadow: none !important; filter: none !important; opacity: 1 !important; }
-        .card.online { border-top-color: var(--success) !important; }
+        /* Pannelli Ripetitori */
+        .card { background: var(--card-bg) !important; border-radius: 4px; padding: 20px; border: 1px solid var(--border-color); border-top: 4px solid var(--border-color) !important; display: flex; flex-direction: column; box-shadow: none !important; filter: none !important; opacity: 1 !important; transition: all 0.3s ease; }
         
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
         .client-name { font-size: 1.1rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
@@ -59,11 +52,11 @@
         .card.online .status-display { color: var(--success); border-color: rgba(46, 160, 67, 0.4); }
         .status-offline { color: var(--danger) !important; border-color: rgba(218, 54, 51, 0.4) !important; }
         
-        /* TimeSlots Override */
+        /* TimeSlots */
         .ts-container { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
         .dmr-info { font-size: 0.85rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; padding: 8px 12px; border-radius: 3px; background: #010409 !important; border: 1px solid var(--border-color); border-left: 4px solid var(--border-color) !important; color: var(--text-muted) !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        /* Terminal Log interno ai pannelli */
+        /* Terminal Log */
         .terminal-log { background: #010409; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; border-radius: 3px; padding: 10px; height: 130px; overflow-y: auto; border: 1px solid var(--border-color); line-height: 1.4; margin-bottom: 15px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5); }
         
         /* Bottoni flat */
@@ -71,102 +64,32 @@
         .btn-cmd { flex: 1; padding: 8px 10px; border: 1px solid var(--border-color); background: #010409 !important; border-radius: 3px; font-weight: 600; font-size: 0.75rem; cursor: pointer; color: var(--text-main) !important; font-family: 'JetBrains Mono', monospace; transition: border-color 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 5px; box-shadow: none !important; }
         .btn-cmd:hover { border-color: var(--text-main); }
   
-        /* Badge di stato MQTT */
+        /* Badge MQTT */
         .mqtt-badge { padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; transition: all 0.3s ease; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; height: 30px;}
         .mqtt-online { background: rgba(46, 160, 67, 0.1); color: var(--success); border-color: var(--success); }
         .mqtt-offline { background: rgba(218, 54, 51, 0.1); color: var(--danger); border-color: var(--danger); animation: pulse-red 2s infinite; }
         @keyframes pulse-red { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         
-        /* Container della tabella con scroll fluido */
-        .table-container { 
-            background: var(--card-bg); 
-            border-radius: 8px; 
-            border: 1px solid var(--border-color); 
-            overflow-x: auto; 
-            overflow-y: auto; 
-            max-height: 500px; /* Un po' più alto per vedere più log */
-            margin: 0 20px 40px 20px; 
-            
-            /* FIX PRO: Scroll fluido su iPhone/Android */
-            -webkit-overflow-scrolling: touch; 
-        }
+        /* Tabella LastHeard */
+        .table-container { background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border-color); overflow-x: auto; overflow-y: auto; max-height: 500px; margin: 0 20px 40px 20px; -webkit-overflow-scrolling: touch; }
+        thead th { position: sticky; top: 0; z-index: 10; background: #1c2128; border-bottom: 2px solid var(--primary); }
+        table { width: 100%; min-width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
+        th, td { padding: 12px 16px; border-bottom: 1px solid var(--border-color); line-height: 1.6; vertical-align: middle; }
+        th { background-color: rgba(255, 255, 255, 0.03); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        tbody tr:nth-child(even) { background-color: rgba(255, 255, 255, 0.015); }
 
-        /* Ottimizzazione per schermi piccoli (Smartphone) */
-        @media (max-width: 600px) {
-            .table-container {
-                margin: 0 10px 20px 10px; /* Riduciamo i margini laterali per dare più spazio ai dati */
-                border-radius: 4px;        /* Angoli leggermente più secchi */
-            }
-            
-            th, td {
-                padding: 10px 12px;        /* Compattiamo leggermente solo su mobile per non far scorrere troppo */
-                font-size: 0.75rem;        /* Testo leggermente più piccolo per far stare più info */
-            }
-        }
-        
-        /* Testata fissa (Sticky) */
-        thead th {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: #1c2128; /* Un colore solido per non far vedere le righe sotto mentre scorri */
-            border-bottom: 2px solid var(--primary);
-        }
-
-        /* Regole principali della Tabella */
-        table { 
-            width: 100%; 
-            min-width: 100%; /* Forza la tabella a riempire lo schermo sul PC */
-            border-collapse: collapse; 
-            text-align: left; 
-            font-size: 0.85rem; 
-            font-family: 'JetBrains Mono', monospace; 
-            white-space: nowrap; /* Impedisce al testo di andare a capo sul cellulare */
-        }
-
-        /* Spaziatura celle e righe tabella */
-        th, td { 
-            padding: 12px 16px;      /* Aumenta lo spazio interno: 12px sopra/sotto, 16px ai lati */
-            border-bottom: 1px solid var(--border-color); 
-            line-height: 1.6;        /* Aumenta l'interlinea del testo */
-            vertical-align: middle; 
-        }
-
-        /* Stile distinto per l'intestazione */
-        th {
-            background-color: rgba(255, 255, 255, 0.03); 
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Effetto "Zebra" per facilitare la lettura orizzontale */
-        tbody tr:nth-child(even) {
-            background-color: rgba(255, 255, 255, 0.015);
-        }
-
-        /* Animazioni Uniformate per i transiti */
-        @keyframes pulse-border { 
-            0% { border-color: var(--border-color); } 
-            50% { border-color: var(--pulse-color, var(--primary)); } 
-            100% { border-color: var(--border-color); } 
-        }
-        .tx-active-unified { 
-            animation: pulse-border 1.5s infinite !important; 
-            color: var(--text-main) !important; 
-            border-left: 4px solid var(--pulse-color, var(--primary)) !important; 
-            background: #010409 !important; 
-        }
-        
-        /* La vecchia classe blink la teniamo solo per gli allarmi rossi dei demoni KO */
+        /* Animazioni Traffico e Allarmi */
+        @keyframes pulse-border { 0% { border-color: var(--border-color); } 50% { border-color: var(--pulse-color, var(--primary)); } 100% { border-color: var(--border-color); } }
+        .tx-active-unified { animation: pulse-border 1.5s infinite !important; color: var(--text-main) !important; border-left: 4px solid var(--pulse-color, var(--primary)) !important; background: #010409 !important; }
         @keyframes flat-blink { 0% { border-color: var(--border-color); } 50% { border-color: var(--danger); } 100% { border-color: var(--border-color); } }
         .blink { animation: flat-blink 1.5s infinite; color: var(--danger) !important; }
         
         /* Finestre Modali (Popup) */
         .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(1, 4, 9, 0.85); z-index:1000; align-items:center; justify-content:center; }
+        .modal-top { z-index: 5000 !important; } /* Per Alert e Confirm */
         .modal-content { background:var(--card-bg); border:1px solid var(--border-color); padding:25px; border-radius:6px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         
-        /* Elementi Input e Form */
+        /* Input Form */
         .auth-btn { background: #010409; color: var(--text-main); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; transition: border-color 0.2s; }
         .auth-btn:hover { border-color: var(--text-main); }
         input, select { background: #010409; border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 12px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; outline: none; }
@@ -184,6 +107,10 @@
             #auth-container > span { width: 100%; text-align: center; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
             .auth-btn, .theme-switch { flex: 1 1 auto; text-align: center; }
         }
+        @media (max-width: 600px) {
+            .table-container { margin: 0 10px 20px 10px; border-radius: 4px; }
+            th, td { padding: 10px 12px; font-size: 0.75rem; }
+        }
     </style>
 </head>
 <body>
@@ -193,7 +120,6 @@
         <div class="title-brand">FLEET CONTROL CONSOLE</div>
         <div style="display: flex; align-items: center; gap: 12px;">
             <span id="mqtt-badge" class="mqtt-badge mqtt-offline">MQTT: CHECKING...</span>
-            
             <button class="theme-switch" id="lang-btn" onclick="toggleLang()" data-i18n-title="ttLang">🇮🇹 ITA</button>
             <button class="theme-switch" id="push-btn" onclick="subscribeToPush()">🔔 PUSH</button>
             <div id="auth-container" style="display:flex; align-items:center; gap:8px;"></div>
@@ -262,25 +188,16 @@
 <footer>
     <div style="text-align: center; padding: 25px; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;">
         <span>&copy; 2026 <strong>IV3JDV @ ARIFVG</strong></span>
-        
         <span style="opacity: 0.5;">|</span>
-        
-        <a href="https://git.arifvg.it/iv3jdv/fleet-control-console" target="_blank" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s;" title="Private Gitea Repository">
-            <svg height="18" viewBox="0 0 24 24" width="18" style="fill: currentColor; vertical-align: middle;">
-                <path d="M15 4V3H1V4H2V12C2 13.1 2.9 14 4 14H10C11.1 14 12 13.1 12 12V4H15ZM10 12H4V4H10V12ZM14 4H12V5H14V4Z" />
-            </svg>
+        <a href="https://git.arifvg.it/iv3jdv/fleet-control-console" target="_blank" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s;">
+            <svg height="18" viewBox="0 0 24 24" width="18" style="fill: currentColor; vertical-align: middle;"><path d="M15 4V3H1V4H2V12C2 13.1 2.9 14 4 14H10C11.1 14 12 13.1 12 12V4H15ZM10 12H4V4H10V12ZM14 4H12V5H14V4Z" /></svg>
             <span>Gitea Home</span>
         </a>
-
         <span style="opacity: 0.5;">|</span>
-
-        <a href="https://github.com/picchiosat/fleet-control-console" target="_blank" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s;" title="Public GitHub Mirror">
-            <svg height="18" viewBox="0 0 16 16" width="18" style="fill: currentColor; vertical-align: middle;">
-                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
-            </svg>
+        <a href="https://github.com/picchiosat/fleet-control-console" target="_blank" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s;">
+            <svg height="18" viewBox="0 0 16 16" width="18" style="fill: currentColor; vertical-align: middle;"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
             <span>GitHub Mirror</span>
         </a>
-
         <span style="opacity: 0.5;">|</span>
         <span id="last-update">Sync: --:--</span>
     </div>
@@ -290,7 +207,7 @@
     <div class="modal-content" style="width:90%; max-width:400px;">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:15px; margin-bottom:20px;">
             <h2 style="margin:0; color:var(--primary);" data-i18n="loginTitle">🔒 System Login</h2>
-            <button onclick="closeLoginModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--danger);" title="Close">✖</button>
+            <button onclick="closeLoginModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--danger);">✖</button>
         </div>
         <div style="display:flex; flex-direction:column; gap:15px;">
             <input type="text" id="modal-username" placeholder="Username" style="width:100%; padding:12px; font-size:1rem;" onkeypress="handleLoginEnter(event)">
@@ -304,9 +221,8 @@
     <div class="modal-content" style="width:90%; max-width:900px;">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:15px; margin-bottom:20px;">
             <h2 style="margin:0;" data-i18n="adminTitle">🛠️ User & System Management</h2>
-            <button onclick="closeAdmin()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--danger);" title="Close">✖</button>
+            <button onclick="closeAdmin()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--danger);">✖</button>
         </div>
-        
         <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; background:rgba(0,0,0,0.05); padding:15px; border-radius:16px; align-items:center;">
             <input type="text" id="new-user" placeholder="Username" style="flex:1; min-width:120px;">
             <input type="password" id="new-pass" placeholder="Password" style="flex:1; min-width:120px;">
@@ -316,9 +232,8 @@
             </select>
             <input type="text" id="new-nodes" placeholder="Nodes (eg: ir3uic,ir3q)" style="flex:2; min-width:150px;">
             <button id="btn-user-submit" onclick="submitUser()" class="btn-cmd" style="background:var(--success); flex:0.5;" data-i18n="btnAdd">+ ADD</button>
-            <button id="btn-user-cancel" onclick="cancelEdit()" class="btn-cmd" style="background:var(--text-muted); flex:0.2; display:none;" title="Cancel">✖</button>
+            <button id="btn-user-cancel" onclick="cancelEdit()" class="btn-cmd" style="background:var(--text-muted); flex:0.2; display:none;">✖</button>
         </div>
-        
         <div style="margin-bottom:20px; background:rgba(59, 130, 246, 0.05); padding:20px; border-radius:16px; border: 1px solid var(--primary);">
             <h4 style="margin:0 0 15px 0; color:var(--primary);" data-i18n="adminDBSync">⚙️ Database Sync Configuration</h4>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
@@ -343,7 +258,7 @@
     <div class="modal-content" style="width:90%; max-width:550px;">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:15px; margin-bottom:15px;">
             <h2 style="margin:0; color:var(--accent);"><span data-i18n="modSvcTitle">⚙️ System Daemons:</span> <span id="svc-modal-title" style="color:var(--text-main);"></span></h2>
-            <button onclick="closeServicesModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--danger);" title="Close">✖</button>
+            <button onclick="closeServicesModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--danger);">✖</button>
         </div>
         <div id="services-list" style="max-height: 400px; overflow-y: auto; padding-right:10px;"></div>
     </div>
@@ -353,17 +268,17 @@
     <div class="modal-content" style="width:90%; max-width:500px;">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:15px; margin-bottom:15px;">
             <h2 style="margin:0; color:#8e44ad;" data-i18n="modFileTitle">📂 Configuration Files</h2>
-            <button onclick="closeConfigsModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--danger);" title="Close">✖</button>
+            <button onclick="closeConfigsModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--danger);">✖</button>
         </div>
         <div id="configs-list" style="display:flex; flex-direction:column; gap:10px;"></div>
     </div>
 </div>
 
-<div id="editor-modal" class="modal-overlay" style="background:rgba(0,0,0,0.8); z-index: 3000;">
+<div id="editor-modal" class="modal-overlay">
     <div class="modal-content" style="width:95%; max-width:900px; border: 1px solid var(--accent);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <h3 style="margin:0; color:var(--accent);"><span data-i18n="modEditTitle">📝 INI File Editor:</span> <span id="editor-title" style="color:var(--text-main);"></span></h3>
-            <button onclick="closeEditorModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--danger);" title="Close">✖</button>
+            <button onclick="closeEditorModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--danger);">✖</button>
         </div>
         <div style="background:rgba(239, 68, 68, 0.1); border-left:4px solid var(--danger); padding:10px; margin-bottom:15px; font-size:0.85rem; font-weight:bold; border-radius: 8px;" data-i18n="warnEdit">
             ⚠️ WARNING: This editor directly manipulates remote node parameters.
@@ -376,7 +291,7 @@
     </div>
 </div>
 
-<div id="alert-modal" class="modal-overlay" style="z-index: 5000;">
+<div id="alert-modal" class="modal-overlay modal-top">
     <div class="modal-content" style="width:90%; max-width:400px; text-align:center; border: 2px solid var(--primary);" id="alert-box">
         <h2 style="margin-top:0;" id="alert-title">ℹ️ INFO</h2>
         <p style="margin-bottom:25px; color:var(--text-main); font-weight: 600;" id="alert-desc">Message</p>
@@ -384,7 +299,7 @@
     </div>
 </div>
 
-<div id="confirm-modal" class="modal-overlay" style="z-index: 4000;">
+<div id="confirm-modal" class="modal-overlay modal-top">
     <div class="modal-content" style="width:90%; max-width:400px; text-align:center; border: 2px solid var(--danger);" id="confirm-box">
         <h2 style="margin-top:0;" id="confirm-title">⚠️ WARNING</h2>
         <p style="margin-bottom:25px; color:var(--text-main); font-weight: 600;" id="confirm-desc">Are you sure?</p>
@@ -395,7 +310,7 @@
     </div>
 </div>
 
-<div id="password-modal" class="modal-overlay" style="z-index: 3000;">
+<div id="password-modal" class="modal-overlay">
     <div class="modal-content" style="width:90%; max-width:400px; text-align:center; border: 1px solid var(--accent);">
         <h2 style="margin-top:0; color:var(--accent);">🔑 <span data-i18n="btnPass">PASSWORD CHANGE</span></h2>
         <p style="margin-bottom:20px; color:var(--text-main); font-weight: 600;" data-i18n="promptPass">Enter the new password:</p>
@@ -407,7 +322,7 @@
     </div>
 </div>
 
-<div id="override-modal" class="modal-overlay" style="z-index: 3000;">
+<div id="override-modal" class="modal-overlay">
     <div class="modal-content" style="width:90%; max-width:400px; text-align:center;">
         <h2 style="margin-top:0; color:var(--danger);">🚨 <span data-i18n="titleGlobal">GLOBAL OVERRIDE</span> 🚨</h2>
         <p style="margin-bottom:25px; color:var(--text-muted); font-weight: 600;" id="override-desc">Select the profile to send to the ENTIRE network:</p>
@@ -419,7 +334,7 @@
     </div>
 </div>
 
-<div id="reset-hat-modal" class="modal-overlay" style="z-index: 3000;">
+<div id="reset-hat-modal" class="modal-overlay">
     <div class="modal-content" style="width:90%; max-width:400px; text-align:center; border: 1px solid var(--danger);">
         <h2 style="margin-top:0; color:var(--danger);">🔌 <span data-i18n="btnHat">RESET HAT</span> 🔌</h2>
         <p style="margin-bottom:25px; color:var(--text-main); font-weight: 600;" id="reset-hat-desc">Do you want to send a PHYSICAL RESET to the radio board?</p>
@@ -430,7 +345,7 @@
     </div>
 </div>
 
-<div id="update-modal" class="modal-overlay" style="z-index: 3000;">
+<div id="update-modal" class="modal-overlay">
     <div class="modal-content" style="width:90%; max-width:400px; text-align:center; border: 1px solid var(--accent);">
         <h2 style="margin-top:0; color:var(--accent);">🔄 <span data-i18n="modUpdateTitle">GLOBAL UPDATE</span> 🔄</h2>
         <p style="margin-bottom:25px; color:var(--text-main); font-weight: 600;" data-i18n="confUpdate">Do you want to request updated data from all nodes in the fleet?</p>
@@ -447,7 +362,6 @@
     // --- 1. TRANSLATION SYSTEM (i18n) ---
     const i18n = {
         en: {
-            themeLight: "☀️ LIGHT", themeDark: "🌙 DARK",
             lastTransits: "Lastheard", loginTitle: "🔒 System Login",
             thTime: "Time", thRep: "Repeater", thMode: "Mode", thCall: "Callsign", thDur: "Duration",
             thUser: "User", thRole: "Role", thNodes: "Nodes", thActs: "Actions",
@@ -472,12 +386,11 @@
             titleSwitch: "SWITCH PROFILE", confSwitch: "Are you sure you want to switch to", titleBoot: "SYSTEM REBOOT", confBoot: "Are you sure you want to REBOOT node ",
             ttReqCfg: "Request immediate data update", ttGlobal: "Force profile switch on network", ttAdmin: "User and system management", ttPass: "Change your password", ttLogout: "Log out",
             ttProfA: "Switch to Profile A", ttProfB: "Switch to Profile B", ttTgOn: "Enable Telegram notifications", ttTgOff: "Disable Telegram notifications", ttSvc: "Manage system daemons", ttFile: "Edit .ini configuration files", ttHat: "Send physical reset to modem", ttBoot: "Reboot node operating system",
-            ttSwitchTo: "Switch to profile: ", ttSvcStart: "Start service", ttSvcRestart: "Restart service", ttSvcEdit: "Edit configuration", ttSvcStop: "Stop service", ttLang: "Change language", ttTheme: "Change visual theme",
+            ttSwitchTo: "Switch to profile: ", ttSvcStart: "Start service", ttSvcRestart: "Restart service", ttSvcEdit: "Edit configuration", ttSvcStop: "Stop service", ttLang: "Change language",
             statTopTG: "🎯 TOP TALKGROUPS", statTopCall: "🗣️ TOP CALLSIGNS", statLoading: "Loading...", statAvgDur: "⏱️ AVERAGE DURATION", statTodayTx: "📡 TRANSITS TODAY", statNoData: "No data",
             statTitle: "DAILY STATISTICS", statAllNodes: "ALL NODES"
         },
         it: {
-            themeLight: "☀️ CHIARO", themeDark: "🌙 SCURO",
             lastTransits: "Ultimi ascolti", loginTitle: "🔒 Login di Sistema",
             thTime: "Ora", thRep: "Ripetitore", thMode: "Modo", thCall: "Nominativo", thDur: "Durata",
             thUser: "Utente", thRole: "Ruolo", thNodes: "Nodi", thActs: "Azioni",
@@ -502,7 +415,7 @@
             titleSwitch: "CAMBIO PROFILO", confSwitch: "Sei sicuro di voler passare al", titleBoot: "RIAVVIO SISTEMA", confBoot: "Sei sicuro di voler RIAVVIARE il nodo ",
             ttReqCfg: "Richiedi aggiornamento dati", ttGlobal: "Forza cambio profilo globale", ttAdmin: "Gestione utenti e sistema", ttPass: "Cambia la tua password", ttLogout: "Disconnetti",
             ttProfA: "Passa al Profilo A", ttProfB: "Passa al Profilo B", ttTgOn: "Abilita notifiche Telegram", ttTgOff: "Disabilita notifiche Telegram", ttSvc: "Gestisci demoni di sistema", ttFile: "Modifica file .ini da remoto", ttHat: "Reset fisico scheda modem", ttBoot: "Riavvia sistema operativo",
-            ttSwitchTo: "Passa al profilo: ", ttSvcStart: "Avvia servizio", ttSvcRestart: "Riavvia servizio", ttSvcEdit: "Modifica configurazione", ttSvcStop: "Ferma servizio", ttLang: "Cambia lingua", ttTheme: "Cambia tema visivo",
+            ttSwitchTo: "Passa al profilo: ", ttSvcStart: "Avvia servizio", ttSvcRestart: "Riavvia servizio", ttSvcEdit: "Modifica configurazione", ttSvcStop: "Ferma servizio", ttLang: "Cambia lingua",
             statTopTG: "🎯 TOP TALKGROUPS", statTopCall: "🗣️ TOP CALLSIGNS", statLoading: "Caricamento...", statAvgDur: "⏱️ DURATA MEDIA", statTodayTx: "📡 TRANSITI OGGI", statNoData: "Nessun dato",
             statTitle: "STATISTICHE GIORNALIERE", statAllNodes: "TUTTA LA RETE"
         }
@@ -513,26 +426,20 @@
     
     function applyTranslations() {
         document.getElementById('lang-btn').innerText = currentLang === 'it' ? "🇬🇧 ENG" : "🇮🇹 ITA";
-        
-        // Translate innerHTML
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             if (i18n[currentLang][key]) el.innerHTML = i18n[currentLang][key];
         });
-        
-        // Translate tooltips (titles)
         document.querySelectorAll('[data-i18n-title]').forEach(el => {
             const key = el.getAttribute('data-i18n-title');
             if (i18n[currentLang][key]) el.title = i18n[currentLang][key];
         });
-
-        // Translate placeholders
         const newPassInput = document.getElementById('new-pass');
         if (newPassInput && editingUserId) newPassInput.placeholder = t('phNewPass');
         else if (newPassInput) newPassInput.placeholder = t('phPass');
     }
 
-    // --- GLOBAL VARIABLES & THEMES ---
+    // --- GLOBAL VARIABLES ---
     let clients = [];
     let isAuthenticated = sessionStorage.getItem('is_admin') === 'true';
     let globalHealthData = {};
@@ -540,7 +447,7 @@
     let currentResetHatId = null; 
     let confirmActionCallback = null; 
 
-    // --- NEW GLOBAL GLASSMORPHISM POPUPS ---
+    // --- POPUPS & ALERTS ---
     function customAlert(title, desc, isError = false) {
         const color = isError ? 'var(--danger)' : 'var(--success)';
         document.getElementById('alert-title').innerHTML = title;
@@ -575,7 +482,6 @@
         const title = customTitle || t('titleAction');
         const msg = customMsg || `${t('confOp')}<b>${clientId.toUpperCase()}</b>?`;
         const color = customColor || "var(--primary)";
-
         customConfirm(title, msg, color, async () => {
             try {
                 const res = await fetch('/api/command', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId, type }) });
@@ -589,38 +495,28 @@
     function confirmSwitch(id, mode) { 
         const data = globalHealthData[id.toLowerCase()];
         let profileName = mode === 'A' ? "PROFILE A" : "PROFILE B";
-        if (data && data.profiles && data.profiles[mode]) {
-            profileName = data.profiles[mode];
-        }
+        if (data && data.profiles && data.profiles[mode]) profileName = data.profiles[mode];
         const title = `🔄 ${t('titleSwitch')}`;
         const msg = `${t('confSwitch')} <b>${profileName}</b> -> <b>${id.toUpperCase()}</b>?`;
         const color = mode === 'A' ? "var(--accent)" : "#eab308";
         sendCommand(id, mode, title, msg, color); 
     }
     
-    function confirmReboot(id) { 
-        const title = `🔄 ${t('titleBoot')}`;
-        const msg = `${t('confBoot')}<b>${id.toUpperCase()}</b>?`;
-        sendCommand(id, 'REBOOT', title, msg, "var(--danger)"); 
-    }
+    function confirmReboot(id) { sendCommand(id, 'REBOOT', `🔄 ${t('titleBoot')}`, `${t('confBoot')}<b>${id.toUpperCase()}</b>?`, "var(--danger)"); }
     
     function confirmHatReset(id) { 
         currentResetHatId = id;
         document.getElementById('reset-hat-desc').innerText = `${t('confHat')}${id.toUpperCase()}?`;
         document.getElementById('reset-hat-modal').style.display = 'flex';
     }
-    function closeHatResetModal() {
-        document.getElementById('reset-hat-modal').style.display = 'none';
-        currentResetHatId = null;
-    }
+    function closeHatResetModal() { document.getElementById('reset-hat-modal').style.display = 'none'; currentResetHatId = null; }
+    
     async function executeHatReset() {
         if (!currentResetHatId) return;
         const clientId = currentResetHatId;
         closeHatResetModal(); 
         try {
-            const res = await fetch('/api/command', { 
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId: clientId, type: 'RESET_HAT' }) 
-            });
+            const res = await fetch('/api/command', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId: clientId, type: 'RESET_HAT' }) });
             const data = await res.json();
             if(!data.success) { customAlert(t('titleError'), data.error, true); }
             refreshStates();
@@ -632,10 +528,8 @@
     
     async function executeUpdateRequest() {
         closeUpdateModal();
-        try {
-            await fetch('/api/update_nodes', { method: 'POST' });
-            customAlert(t('titleSuccess'), t('alertUpdateOk'));
-        } catch (e) { console.error(e); }
+        try { await fetch('/api/update_nodes', { method: 'POST' }); customAlert(t('titleSuccess'), t('alertUpdateOk')); } 
+        catch (e) { console.error(e); }
     }
 
     function sendTgCommand(clientId, comando) {
@@ -655,21 +549,17 @@
         applyTranslations();
         try {
             const response = await fetch('/api/clients');
-            clients = await response.json(); // <-- CORREZIONE 2: Ora carichiamo i dati prima di usarli!
+            clients = await response.json();
 
-            // Popola il menu a tendina delle statistiche
             const statSelect = document.getElementById('stat-node-filter');
             if (statSelect) {
                 let opts = `<option value="all">🌐 ${t('statAllNodes')}</option>`;
-                clients.forEach(c => {
-                    opts += `<option value="${c.id}">${c.name} (${c.id.toUpperCase()})</option>`;
-                });
+                clients.forEach(c => { opts += `<option value="${c.id}">${c.name} (${c.id.toUpperCase()})</option>`; });
                 statSelect.innerHTML = opts;
             }
 
             const grid = document.getElementById('client-grid');
             const authContainer = document.getElementById('auth-container');
-
             const role = sessionStorage.getItem('user_role');
             const allowed = sessionStorage.getItem('allowed_nodes') || "";
 
@@ -731,7 +621,7 @@
                             <button id="btn-svc-${c.id}" class="btn-cmd" style="background: #334155;" title="${t('ttSvc')}" onclick="openServicesModal('${c.id}')">${t('btnSvc')}</button>
                             <button class="btn-cmd" style="background: #8e44ad;" title="${t('ttFile')}" onclick="openConfigsModal('${c.id}')">${t('btnFile')}</button>
                             <button class="btn-cmd" style="background: #ea580c;" title="${t('ttHat')}" onclick="confirmHatReset('${c.id}')">${t('btnHat')}</button>
-                            <button class="btn-cmd btn-reboot" style="background: var(--danger);" title="${t('ttBoot')}" onclick="confirmReboot('${c.id}')">${t('btnBoot')}</button>
+                            <button class="btn-cmd" style="background: var(--danger);" title="${t('ttBoot')}" onclick="confirmReboot('${c.id}')">${t('btnBoot')}</button>
                             ` : ''}
                         </div>
                     </div>`;
@@ -741,16 +631,11 @@
         } catch (e) { console.error(e); }
     }
 
-    // --- LOGIN MODAL LOGIC ---
-    function openLoginModal() {
-        document.getElementById('login-modal').style.display = 'flex';
-        setTimeout(() => document.getElementById('modal-username').focus(), 100);
-    }
-    function closeLoginModal() {
-        document.getElementById('login-modal').style.display = 'none';
-        document.getElementById('modal-username').value = ''; document.getElementById('modal-password').value = '';
-    }
+    // --- LOGIN ---
+    function openLoginModal() { document.getElementById('login-modal').style.display = 'flex'; setTimeout(() => document.getElementById('modal-username').focus(), 100); }
+    function closeLoginModal() { document.getElementById('login-modal').style.display = 'none'; document.getElementById('modal-username').value = ''; document.getElementById('modal-password').value = ''; }
     function handleLoginEnter(e) { if (e.key === 'Enter') performLogin(); }
+    
     async function performLogin() {
         const user = document.getElementById('modal-username').value; const pass = document.getElementById('modal-password').value;
         if (!user || !pass) return;
@@ -758,45 +643,33 @@
         const data = await res.json();
         if (res.ok) { 
             sessionStorage.setItem('is_admin', 'true'); sessionStorage.setItem('user_name', user); sessionStorage.setItem('user_role', data.role); sessionStorage.setItem('allowed_nodes', data.allowed_nodes); location.reload(); 
-        } else { 
-            customAlert(t('titleError'), t('msgLoginFail'), true); 
-        }
+        } else { customAlert(t('titleError'), t('msgLoginFail'), true); }
     }
     function logout() { sessionStorage.clear(); location.reload(); }
 
     async function refreshStates() {
         try {
-            const res = await fetch('/api/states');
-            const data = await res.json();
+            const res = await fetch('/api/states'); const data = await res.json();
             clients.forEach(c => {
-                const statusDiv = document.getElementById(`status-${c.id}`);
-                const cardDiv = document.getElementById(`card-${c.id}`);
+                const statusDiv = document.getElementById(`status-${c.id}`); const cardDiv = document.getElementById(`card-${c.id}`);
                 if (!statusDiv || !cardDiv) return;
 
                 let stateValue = data.states[c.id.toLowerCase()] || data.states[c.id] || "OFFLINE";
-                stateValue = String(stateValue).trim().toUpperCase();
-                statusDiv.innerText = stateValue;
+                stateValue = String(stateValue).trim().toUpperCase(); statusDiv.innerText = stateValue;
                 const isOnline = !stateValue.includes("OFF") && stateValue !== "";
 
                 let telemetryObj = data.telemetry[c.id.toLowerCase()] || data.telemetry[c.id] || { ts1: "...", ts2: "...", alt: "", idle: true };
                 if (typeof telemetryObj === 'string') telemetryObj = { ts1: telemetryObj, ts2: "...", alt: "", idle: true };
 
-                const tsContainer = document.getElementById(`ts-container-${c.id}`);
-                const ts1Div = document.getElementById(`dmr-ts1-${c.id}`);
-                const ts2Div = document.getElementById(`dmr-ts2-${c.id}`);
-                const altDiv = document.getElementById(`dmr-alt-${c.id}`);
+                const tsContainer = document.getElementById(`ts-container-${c.id}`); const ts1Div = document.getElementById(`dmr-ts1-${c.id}`); const ts2Div = document.getElementById(`dmr-ts2-${c.id}`); const altDiv = document.getElementById(`dmr-alt-${c.id}`);
                 
-                let isTx = false;
-                let activeModeColor = "var(--success)";
-                let isIdle = telemetryObj.idle === true;
+                let isTx = false; let activeModeColor = "var(--success)"; let isIdle = telemetryObj.idle === true;
 
                 if (telemetryObj.alt && telemetryObj.alt !== "") {
                     if (tsContainer) tsContainer.style.display = "none";
                     if (altDiv) {
-                        altDiv.style.display = "block"; altDiv.innerText = telemetryObj.alt;
-                        let altText = telemetryObj.alt.toUpperCase();
+                        altDiv.style.display = "block"; altDiv.innerText = telemetryObj.alt; let altText = telemetryObj.alt.toUpperCase();
                         
-                        // Assegna il colore in base al modo
                         if (altText.includes("NXDN")) activeModeColor = "#10b981"; 
                         else if (altText.includes("YSF")) activeModeColor = "#8b5cf6"; 
                         else if (altText.includes("D-STAR")) activeModeColor = "#06b6d4"; 
@@ -804,72 +677,42 @@
                         
                         isTx = altText.includes("🟢") || altText.includes("🟣") || altText.includes("🔵") || altText.includes("🟠");
                         
-                        // Passiamo il colore al CSS per l'animazione
                         altDiv.style.setProperty('--pulse-color', activeModeColor);
-                        if (isTx) { 
-                            altDiv.classList.add('tx-active-unified'); 
-                        } else { 
-                            altDiv.classList.remove('tx-active-unified');
-                            altDiv.style.setProperty('color', 'var(--text-muted)', 'important');
-                            altDiv.style.setProperty('border-left', `4px solid var(--border-color)`, 'important');
-                        }
+                        if (isTx) { altDiv.classList.add('tx-active-unified'); } else { altDiv.classList.remove('tx-active-unified'); altDiv.style.setProperty('color', 'var(--text-muted)', 'important'); altDiv.style.setProperty('border-left', `4px solid var(--border-color)`, 'important'); }
                     }
                 } else {
                     if (altDiv) altDiv.style.display = "none";
                     if (tsContainer) tsContainer.style.display = "flex";
                     
                     let netObj = data.networks && data.networks[c.id.toLowerCase()] ? data.networks[c.id.toLowerCase()] : {ts1: "", ts2: ""};
-                    activeModeColor = "var(--primary)"; // Default Blu per il DMR
+                    activeModeColor = "var(--primary)";
                     
                     if (ts1Div && ts2Div) {
                         [ts1Div, ts2Div].forEach((div, idx) => {
-                            const val = idx === 0 ? telemetryObj.ts1 : telemetryObj.ts2;
-                            const netName = idx === 0 ? netObj.ts1 : netObj.ts2;
-                            const baseLabel = `TS${idx + 1}`;
-                            const fullLabel = netName ? `${baseLabel} [${netName}]` : baseLabel;
-
+                            const val = idx === 0 ? telemetryObj.ts1 : telemetryObj.ts2; const netName = idx === 0 ? netObj.ts1 : netObj.ts2;
+                            const fullLabel = netName ? `TS${idx + 1} [${netName}]` : `TS${idx + 1}`;
                             div.innerText = `${fullLabel}: ${val}`;
                             div.style.setProperty('--pulse-color', activeModeColor);
                             
-                            if (val.includes("🎙️")) {
-                                isTx = true;
-                                div.classList.add('tx-active-unified');
-                            } else {
-                                div.classList.remove('tx-active-unified');
-                                div.style.setProperty('color', 'var(--text-muted)', 'important');
-                                div.style.setProperty('border-left', '4px solid var(--border-color)', 'important');
-                            }
+                            if (val.includes("🎙️")) { isTx = true; div.classList.add('tx-active-unified'); } 
+                            else { div.classList.remove('tx-active-unified'); div.style.setProperty('color', 'var(--text-muted)', 'important'); div.style.setProperty('border-left', '4px solid var(--border-color)', 'important'); }
                         });
                     }
                 }
 
                 let healthObj = data.health && data.health[c.id.toLowerCase()];
-                const healthContainer = document.getElementById(`health-${c.id}`);
-                const cpuSpan = document.getElementById(`cpu-${c.id}`); const tempSpan = document.getElementById(`temp-${c.id}`); const ramSpan = document.getElementById(`ram-${c.id}`); const diskSpan = document.getElementById(`disk-${c.id}`);
+                const healthContainer = document.getElementById(`health-${c.id}`); const cpuSpan = document.getElementById(`cpu-${c.id}`); const tempSpan = document.getElementById(`temp-${c.id}`); const ramSpan = document.getElementById(`ram-${c.id}`); const diskSpan = document.getElementById(`disk-${c.id}`);
 
                 if (healthObj && isOnline) {
                     healthContainer.style.display = 'flex';
                     let cpu = healthObj.cpu; cpuSpan.innerText = cpu; cpuSpan.style.color = cpu < 50 ? 'var(--success)' : (cpu < 80 ? '#f59e0b' : 'var(--danger)');
-                    
-                    // FIXED TEMPERATURE VARIABLE NAME HERE
-                    let tempVal = healthObj.temp; 
-                    tempSpan.innerText = tempVal; 
-                    tempSpan.style.color = tempVal < 55 ? 'var(--success)' : (tempVal < 70 ? '#f59e0b' : 'var(--danger)');
-                    
+                    let tempVal = healthObj.temp; tempSpan.innerText = tempVal; tempSpan.style.color = tempVal < 55 ? 'var(--success)' : (tempVal < 70 ? '#f59e0b' : 'var(--danger)');
                     ramSpan.innerText = healthObj.ram; let d = healthObj.disk; diskSpan.innerText = d; diskSpan.style.color = d < 85 ? 'inherit' : (d < 95 ? '#f59e0b' : 'var(--danger)');
                     
                     let profA = (healthObj.profiles && healthObj.profiles.A) ? healthObj.profiles.A : "PROFILE A"; let profB = (healthObj.profiles && healthObj.profiles.B) ? healthObj.profiles.B : "PROFILE B";
                     const btnA = document.getElementById(`btn-profA-${c.id}`); const btnB = document.getElementById(`btn-profB-${c.id}`);
-                    
-                    if (btnA) {
-                        if (btnA.innerText !== profA) btnA.innerText = profA;
-                        btnA.title = `${t('ttSwitchTo')}${profA}`;
-                    }
-                    if (btnB) {
-                        if (btnB.innerText !== profB) btnB.innerText = profB;
-                        btnB.title = `${t('ttSwitchTo')}${profB}`;
-                    }
-
+                    if (btnA) { btnA.innerText = profA; btnA.title = `${t('ttSwitchTo')}${profA}`; }
+                    if (btnB) { btnB.innerText = profB; btnB.title = `${t('ttSwitchTo')}${profB}`; }
                 } else { if (healthContainer) healthContainer.style.display = 'none'; }
 
                 globalHealthData[c.id.toLowerCase()] = healthObj;
@@ -887,30 +730,19 @@
                 }
 
                 if (isOnline) {
-                    cardDiv.classList.add('online'); statusDiv.classList.remove('status-offline');
-                    cardDiv.style.opacity = "1"; cardDiv.style.filter = "none";
-                    
-                    let targetBorderColor = activeModeColor; 
-                    if (!isTx && isIdle) { targetBorderColor = "var(--border-color)"; }
-                    cardDiv.style.setProperty('border-top-color', targetBorderColor, 'important');
-                    
+                    cardDiv.classList.add('online'); statusDiv.classList.remove('status-offline'); cardDiv.style.opacity = "1"; cardDiv.style.filter = "none";
+                    cardDiv.style.setProperty('border-top-color', (!isTx && isIdle) ? "var(--border-color)" : activeModeColor, 'important');
                     if(isTx) {
-                        // Creiamo un alone luminoso che sia SEMPRE dello stesso colore del modo attivo
-                        let shadowRGB = '59, 130, 246'; // Blu di default (per DMR e var(--primary))
-                        if (activeModeColor === '#10b981') shadowRGB = '16, 185, 129'; // Verde (NXDN)
-                        else if (activeModeColor === '#8b5cf6') shadowRGB = '139, 92, 246'; // Viola (YSF)
-                        else if (activeModeColor === '#06b6d4') shadowRGB = '6, 182, 212'; // Ciano (D-STAR)
-                        else if (activeModeColor === '#f59e0b') shadowRGB = '245, 158, 11'; // Arancione (P25)
-
+                        let shadowRGB = '59, 130, 246'; 
+                        if (activeModeColor === '#10b981') shadowRGB = '16, 185, 129'; 
+                        else if (activeModeColor === '#8b5cf6') shadowRGB = '139, 92, 246'; 
+                        else if (activeModeColor === '#06b6d4') shadowRGB = '6, 182, 212'; 
+                        else if (activeModeColor === '#f59e0b') shadowRGB = '245, 158, 11'; 
                         cardDiv.style.boxShadow = `0 0 20px rgba(${shadowRGB}, 0.5)`;
-                    } else {
-                        cardDiv.style.boxShadow = 'var(--glass-shadow)';
-                    }
+                    } else { cardDiv.style.boxShadow = 'none'; }
                 } else {
-                    cardDiv.classList.remove('online'); statusDiv.classList.add('status-offline');
-                    cardDiv.style.opacity = "0.7"; cardDiv.style.filter = "grayscale(80%)";
-                    cardDiv.style.setProperty('border-top-color', '#64748b', 'important'); 
-                    cardDiv.style.boxShadow = 'var(--glass-shadow)';
+                    cardDiv.classList.remove('online'); statusDiv.classList.add('status-offline'); cardDiv.style.opacity = "0.7"; cardDiv.style.filter = "grayscale(80%)";
+                    cardDiv.style.setProperty('border-top-color', '#64748b', 'important'); cardDiv.style.boxShadow = 'none';
                 }
             });
             document.getElementById('last-update').innerText = "Sync: " + new Date().toLocaleTimeString();
@@ -923,17 +755,9 @@
             const tbody = document.getElementById('log-body'); let tableHTML = ""; let networkLogs = {};
             logs.forEach(row => {
                 const time = row[0] ? row[0].split(' ')[1] : "--:--"; 
-                const clientId = row[1]; 
-                const protocol = row[2] || "DMR"; 
-                let source = row[3] || "---"; 
-                const target = row[4] || "---"; 
-                const rawSlot = row[5]; 
-                const source_ext = row[8]; // <--- NUOVO CAMPO DAL BACKEND
-
-                // Formattiamo il source_ext se presente e non vuoto
-                if (source_ext && source_ext.trim() !== "") {
-                    source = `${source} <span style="font-size:0.8em; color:#94a3b8; font-family:'JetBrains Mono', monospace;">/${source_ext}</span>`;
-                }
+                const clientId = row[1]; const protocol = row[2] || "DMR"; let source = row[3] || "---"; const target = row[4] || "---"; 
+                const rawSlot = row[5]; const source_ext = row[8];
+                if (source_ext && source_ext.trim() !== "") { source = `${source} <span style="font-size:0.8em; color:#94a3b8; font-family:'JetBrains Mono', monospace;">/${source_ext}</span>`; }
 
                 const slotDisplay = protocol === "DMR" ? `TS${rawSlot}` : "--";
                 let protoColor = "#3b82f6"; if (protocol === "NXDN") protoColor = "#10b981"; else if (protocol === "YSF") protoColor = "#8b5cf6"; else if (protocol === "D-STAR") protoColor = "#06b6d4"; else if (protocol === "P25") protoColor = "#f59e0b";
@@ -953,25 +777,14 @@
     async function refreshStats() {
         try {
             const node = document.getElementById('stat-node-filter').value || 'all';
-            const res = await fetch(`/api/stats?node=${node}`);
-            const data = await res.json();
-            
-            // Compila Top TG
-            let tgsHtml = data.top_tgs.map((t, i) => `<div><b style="color:var(--text-main);">${i+1}. ${t.target}</b> <span style="float:right; background:rgba(128,128,128,0.1); padding:2px 6px; border-radius:4px;">${t.count} tx</span></div>`).join('');
-            document.getElementById('stat-tgs').innerHTML = tgsHtml || t('statNoData');
-            
-            // Compila Top Callsign
-            let callsHtml = data.top_calls.map((c, i) => `<div><b style="color:var(--text-main);">${i+1}. ${c.call}</b> <span style="float:right; background:rgba(128,128,128,0.1); padding:2px 6px; border-radius:4px;">${c.count} tx</span></div>`).join('');
-            document.getElementById('stat-calls').innerHTML = callsHtml || t('statNoData');
-            
-            // Compila Medie e Totali
-            document.getElementById('stat-avg').innerText = data.avg_duration;
-            document.getElementById('stat-today').innerText = data.today_tx;
-            
-        } catch (e) { console.error("Errore caricamento statistiche:", e); }
+            const res = await fetch(`/api/stats?node=${node}`); const data = await res.json();
+            document.getElementById('stat-tgs').innerHTML = data.top_tgs.map((t, i) => `<div><b style="color:var(--text-main);">${i+1}. ${t.target}</b> <span style="float:right; background:rgba(128,128,128,0.1); padding:2px 6px; border-radius:4px;">${t.count} tx</span></div>`).join('') || t('statNoData');
+            document.getElementById('stat-calls').innerHTML = data.top_calls.map((c, i) => `<div><b style="color:var(--text-main);">${i+1}. ${c.call}</b> <span style="float:right; background:rgba(128,128,128,0.1); padding:2px 6px; border-radius:4px;">${c.count} tx</span></div>`).join('') || t('statNoData');
+            document.getElementById('stat-avg').innerText = data.avg_duration; document.getElementById('stat-today').innerText = data.today_tx;
+        } catch (e) { console.error("Errore statistiche:", e); }
     }
 
-    // --- USER MANAGEMENT (ADD & EDIT) ---
+    // --- USER MANAGEMENT ---
     async function openAdmin() { document.getElementById('admin-modal').style.display = 'flex'; loadUsers(); loadSettings(); cancelEdit(); }
     function closeAdmin() { document.getElementById('admin-modal').style.display = 'none'; cancelEdit(); }
     
@@ -979,159 +792,79 @@
         const res = await fetch('/api/users'); const users = await res.json();
         document.getElementById('users-table-body').innerHTML = users.map(u => `
             <tr>
-                <td>${u.id}</td>
-                <td style="font-weight:bold;">${u.username}</td>
-                <td><span style="background:rgba(128,128,128,0.2); padding:2px 8px; border-radius:6px; font-size:0.8rem;">${u.role.toUpperCase()}</span></td>
-                <td>${u.allowed_nodes}</td>
+                <td>${u.id}</td><td style="font-weight:bold;">${u.username}</td><td><span style="background:rgba(128,128,128,0.2); padding:2px 8px; border-radius:6px; font-size:0.8rem;">${u.role.toUpperCase()}</span></td><td>${u.allowed_nodes}</td>
                 <td style="text-align:center;">
-                    <button onclick="startEditUser(${u.id}, '${u.username}', '${u.role}', '${u.allowed_nodes}')" class="btn-cmd" style="background:var(--accent); padding:6px; width:auto; display:inline-block; margin-right:5px;" title="Edit User">✏️</button>
-                    <button onclick="deleteUser(${u.id})" class="btn-cmd" style="background:var(--danger); padding:6px; width:auto; display:inline-block;" title="Delete User">🗑️</button>
+                    <button onclick="startEditUser(${u.id}, '${u.username}', '${u.role}', '${u.allowed_nodes}')" class="btn-cmd" style="background:var(--accent); padding:6px; width:auto; display:inline-block; margin-right:5px;">✏️</button>
+                    <button onclick="deleteUser(${u.id})" class="btn-cmd" style="background:var(--danger); padding:6px; width:auto; display:inline-block;">🗑️</button>
                 </td>
             </tr>`).join('');
     }
 
     function startEditUser(id, username, role, nodes) {
-        editingUserId = id;
-        document.getElementById('new-user').value = username;
-        document.getElementById('new-user').disabled = true;
-        document.getElementById('new-pass').value = "";
-        document.getElementById('new-pass').placeholder = t('phNewPass');
-        document.getElementById('new-role').value = role;
-        document.getElementById('new-nodes').value = nodes;
-        
-        const btnSubmit = document.getElementById('btn-user-submit');
-        btnSubmit.innerHTML = t('titleSave');
-        btnSubmit.style.background = "var(--accent)";
-        document.getElementById('btn-user-cancel').style.display = "block";
+        editingUserId = id; document.getElementById('new-user').value = username; document.getElementById('new-user').disabled = true; document.getElementById('new-pass').value = ""; document.getElementById('new-pass').placeholder = t('phNewPass'); document.getElementById('new-role').value = role; document.getElementById('new-nodes').value = nodes;
+        const btnSubmit = document.getElementById('btn-user-submit'); btnSubmit.innerHTML = t('titleSave'); btnSubmit.style.background = "var(--accent)"; document.getElementById('btn-user-cancel').style.display = "block";
     }
 
     function cancelEdit() {
-        editingUserId = null;
-        document.getElementById('new-user').value = "";
-        document.getElementById('new-user').disabled = false;
-        document.getElementById('new-pass').value = "";
-        document.getElementById('new-pass').placeholder = t('phPass');
-        document.getElementById('new-role').value = "operator";
-        document.getElementById('new-nodes').value = "";
-        
-        const btnSubmit = document.getElementById('btn-user-submit');
-        btnSubmit.innerHTML = t('btnAdd');
-        btnSubmit.style.background = "var(--success)";
-        document.getElementById('btn-user-cancel').style.display = "none";
+        editingUserId = null; document.getElementById('new-user').value = ""; document.getElementById('new-user').disabled = false; document.getElementById('new-pass').value = ""; document.getElementById('new-pass').placeholder = t('phPass'); document.getElementById('new-role').value = "operator"; document.getElementById('new-nodes').value = "";
+        const btnSubmit = document.getElementById('btn-user-submit'); btnSubmit.innerHTML = t('btnAdd'); btnSubmit.style.background = "var(--success)"; document.getElementById('btn-user-cancel').style.display = "none";
     }
 
     async function submitUser() {
-        const username = document.getElementById('new-user').value; 
-        const password = document.getElementById('new-pass').value; 
-        const role = document.getElementById('new-role').value; 
-        let allowed = document.getElementById('new-nodes').value;
-        
+        const username = document.getElementById('new-user').value; const password = document.getElementById('new-pass').value; const role = document.getElementById('new-role').value; let allowed = document.getElementById('new-nodes').value;
         if (!username) return customAlert(t('titleError'), t('msgMissUser'), true);
-        
-        const payload = { username, role, allowed_nodes: allowed || 'all' };
-        if (password) payload.password = password;
+        const payload = { username, role, allowed_nodes: allowed || 'all' }; if (password) payload.password = password;
 
         if (editingUserId) {
-            const res = await fetch(`/api/users/${editingUserId}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-            const data = await res.json(); 
+            const res = await fetch(`/api/users/${editingUserId}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) }); const data = await res.json(); 
             if (data.success) { cancelEdit(); loadUsers(); } else customAlert(t('titleError'), data.error, true);
         } else {
             if (!password) return customAlert(t('titleError'), t('msgMissPass'), true);
-            const res = await fetch('/api/users', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-            const data = await res.json(); 
+            const res = await fetch('/api/users', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) }); const data = await res.json(); 
             if (data.success) { cancelEdit(); loadUsers(); } else customAlert(t('titleError'), data.error, true);
         }
     }
 
-    function deleteUser(id) { 
-        customConfirm(t('titleDelete'), t('msgDelUser'), "var(--danger)", async () => {
-            await fetch(`/api/users/${id}`, {method: 'DELETE'}); 
-            loadUsers(); 
-            cancelEdit(); 
-        });
-    }
+    function deleteUser(id) { customConfirm(t('titleDelete'), t('msgDelUser'), "var(--danger)", async () => { await fetch(`/api/users/${id}`, {method: 'DELETE'}); loadUsers(); cancelEdit(); }); }
     
-    // --- EMERGENCY & SETTINGS ---
+    // --- SETTINGS ---
     function triggerGlobalEmergency() {
-        let nameA = "PROFILE A";
-        let nameB = "PROFILE B";
-        for (const id in globalHealthData) {
-            if (globalHealthData[id] && globalHealthData[id].profiles) {
-                nameA = globalHealthData[id].profiles.A || nameA;
-                nameB = globalHealthData[id].profiles.B || nameB;
-                break;
-            }
-        }
-        
-        document.getElementById('btn-global-A').innerText = nameA;
-        document.getElementById('btn-global-B').innerText = nameB;
-        document.getElementById('override-desc').innerText = t('msgOvrSel');
-        document.getElementById('override-modal').style.display = 'flex';
+        let nameA = "PROFILE A"; let nameB = "PROFILE B";
+        for (const id in globalHealthData) { if (globalHealthData[id] && globalHealthData[id].profiles) { nameA = globalHealthData[id].profiles.A || nameA; nameB = globalHealthData[id].profiles.B || nameB; break; } }
+        document.getElementById('btn-global-A').innerText = nameA; document.getElementById('btn-global-B').innerText = nameB; document.getElementById('override-desc').innerText = t('msgOvrSel'); document.getElementById('override-modal').style.display = 'flex';
     }
 
     function sendGlobalAction(action) {
         document.getElementById('override-modal').style.display = 'none';
-        
         customConfirm(t('titleGlobal'), t('promptOvrConfirm'), "var(--danger)", async () => {
-            try {
-                const res = await fetch('/api/global_command', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type: action}) }); 
-                const d = await res.json(); 
-                if(d.success) {
-                    customAlert(t('titleSuccess'), t('msgOvrOk')); 
-                } else {
-                    customAlert(t('titleError'), d.error, true);
-                }
-                refreshStates();
+            try { const res = await fetch('/api/global_command', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type: action}) }); const d = await res.json(); 
+                if(d.success) customAlert(t('titleSuccess'), t('msgOvrOk')); else customAlert(t('titleError'), d.error, true); refreshStates();
             } catch(e) { console.error(e); }
         });
     }
 
-    function changeMyPassword() { 
-        document.getElementById('new-password-input').value = '';
-        document.getElementById('password-modal').style.display = 'flex';
-        setTimeout(() => document.getElementById('new-password-input').focus(), 100);
-    }
+    function changeMyPassword() { document.getElementById('new-password-input').value = ''; document.getElementById('password-modal').style.display = 'flex'; setTimeout(() => document.getElementById('new-password-input').focus(), 100); }
     function closePasswordModal() { document.getElementById('password-modal').style.display = 'none'; }
     async function executePasswordChange() {
-        const p = document.getElementById('new-password-input').value;
-        if (!p) return;
-        closePasswordModal();
-        try {
-            const res = await fetch('/api/change_password', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: sessionStorage.getItem('user_name'), new_password: p}) }); 
-            if ((await res.json()).success) { 
-                customAlert(t('titleSuccess'), t('msgPassOk'));
-                setTimeout(() => logout(), 1500);
-            } else {
-                customAlert(t('titleError'), t('msgPassErr'), true);
-            }
+        const p = document.getElementById('new-password-input').value; if (!p) return; closePasswordModal();
+        try { const res = await fetch('/api/change_password', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: sessionStorage.getItem('user_name'), new_password: p}) }); 
+            if ((await res.json()).success) { customAlert(t('titleSuccess'), t('msgPassOk')); setTimeout(() => logout(), 1500); } else { customAlert(t('titleError'), t('msgPassErr'), true); }
         } catch(e) { console.error(e); }
     }
 
     async function loadSettings() { try { const res = await fetch('/api/config'); const data = await res.json(); document.getElementById('update-time-input').value = data.update_schedule; document.getElementById('url-dmr-input').value = data.url_dmr; document.getElementById('url-nxdn-input').value = data.url_nxdn; } catch (e) { console.error(e); } }
-    
     async function saveSettings() { 
         const payload = { update_schedule: document.getElementById('update-time-input').value, url_dmr: document.getElementById('url-dmr-input').value, url_nxdn: document.getElementById('url-nxdn-input').value }; 
-        try { 
-            const res = await fetch('/api/config', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) }); 
-            const data = await res.json(); 
-            if (data.success) customAlert(t('titleSuccess'), t('msgConfigSaved')); 
-            else customAlert(t('titleError'), t('msgConfigErr'), true); 
+        try { const res = await fetch('/api/config', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) }); const data = await res.json(); 
+            if (data.success) customAlert(t('titleSuccess'), t('msgConfigSaved')); else customAlert(t('titleError'), t('msgConfigErr'), true); 
         } catch (e) { console.error(e); } 
     }
 
+    // --- SERVICES & CONFIGS ---
     function openConfigsModal(clientId) {
-        const data = globalHealthData[clientId.toLowerCase()];
-        const listDiv = document.getElementById('configs-list');
-        let listaFile = data ? (data.config_files || data.files || []) : [];
-        if (listaFile.length === 0) {
-            listDiv.innerHTML = `<div style="text-align:center; padding:20px;"><p style="color:var(--text-muted); margin-bottom:15px;">${t('waitData')}</p><button onclick="sendGlobalUpdate(); closeConfigsModal();" class="btn-cmd" style="background:var(--accent);">${t('forceUpdate')}</button></div>`;
-        } else {
-            listDiv.innerHTML = listaFile.map(filename => `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:rgba(128,128,128,0.1); border-radius:12px; border:1px solid var(--border-color); margin-bottom:8px;">
-                    <span style="font-family:'JetBrains Mono',monospace; font-weight:bold;">${filename.toUpperCase()}.ini</span>
-                    <button onclick="closeConfigsModal(); openEditorModal('${clientId}', '${filename}')" class="btn-cmd" style="background:#8e44ad; max-width:120px;" title="${t('ttFile')}">${t('btnEdit')}</button>
-                </div>`).join('');
-        }
+        const data = globalHealthData[clientId.toLowerCase()]; const listDiv = document.getElementById('configs-list'); let listaFile = data ? (data.config_files || data.files || []) : [];
+        if (listaFile.length === 0) listDiv.innerHTML = `<div style="text-align:center; padding:20px;"><p style="color:var(--text-muted); margin-bottom:15px;">${t('waitData')}</p><button onclick="sendGlobalUpdate(); closeConfigsModal();" class="btn-cmd" style="background:var(--accent);">${t('forceUpdate')}</button></div>`;
+        else listDiv.innerHTML = listaFile.map(f => `<div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:rgba(128,128,128,0.1); border-radius:12px; border:1px solid var(--border-color); margin-bottom:8px;"><span style="font-family:'JetBrains Mono',monospace; font-weight:bold;">${f.toUpperCase()}.ini</span><button onclick="closeConfigsModal(); openEditorModal('${clientId}', '${f}')" class="btn-cmd" style="background:#8e44ad; max-width:120px;">${t('btnEdit')}</button></div>`).join('');
         document.getElementById('configs-modal').style.display = 'flex';
     }
     function closeConfigsModal() { document.getElementById('configs-modal').style.display = 'none'; }
@@ -1143,29 +876,23 @@
         if (!data || !data.processes || Object.keys(data.processes).length === 0) { listDiv.innerHTML = "<p style='text-align:center; color:var(--text-muted);'>No service data available.</p>"; return; }
         let html = "";
         for (const [name, status] of Object.entries(data.processes)) {
-            const isOnline = status.toLowerCase() === 'online'; const statusColor = isOnline ? 'var(--success)' : 'var(--danger)'; const statusAnim = isOnline ? '' : 'animation: pulse-glow 1.5s infinite;';
-            html += `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid var(--border-color); background:rgba(128,128,128,0.05); border-radius:12px; margin-bottom:8px; border-left: 5px solid ${statusColor};">
-                <div>
-                    <strong style="font-size:1.1rem; display:block; font-family:'JetBrains Mono',monospace;">${name}</strong>
-                    <span style="color:${statusColor}; font-size:0.8rem; font-weight:800; ${statusAnim}">${status.toUpperCase()}</span>
-                </div>
-                <div style="display:flex; gap:8px;">
-                    ${!isOnline ? `<button onclick="controlService('${clientId}', '${name}', 'start')" class="btn-cmd" style="background:var(--success);" title="${t('ttSvcStart')}">▶</button>` : ''}
-                    <button onclick="controlService('${clientId}', '${name}', 'restart')" class="btn-cmd" style="background:#f59e0b;" title="${t('ttSvcRestart')}">🔄</button>
-                    <button onclick="openEditorModal('${clientId}', '${name}')" class="btn-cmd" style="background:#8e44ad;" title="${t('ttSvcEdit')}">📝</button>
-                    ${isOnline ? `<button onclick="controlService('${clientId}', '${name}', 'stop')" class="btn-cmd" style="background:var(--danger);" title="${t('ttSvcStop')}">🛑</button>` : ''}
-                </div>
-            </div>`;
+            const isOnline = status.toLowerCase() === 'online'; const statusColor = isOnline ? 'var(--success)' : 'var(--danger)'; 
+            html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid var(--border-color); background:rgba(128,128,128,0.05); border-radius:12px; margin-bottom:8px; border-left: 5px solid ${statusColor};">
+                        <div><strong style="font-size:1.1rem; display:block; font-family:'JetBrains Mono',monospace;">${name}</strong><span class="${isOnline?'':'blink'}" style="color:${statusColor}; font-size:0.8rem; font-weight:800;">${status.toUpperCase()}</span></div>
+                        <div style="display:flex; gap:8px;">
+                            ${!isOnline ? `<button onclick="controlService('${clientId}', '${name}', 'start')" class="btn-cmd" style="background:var(--success);">▶</button>` : ''}
+                            <button onclick="controlService('${clientId}', '${name}', 'restart')" class="btn-cmd" style="background:#f59e0b;">🔄</button>
+                            <button onclick="openEditorModal('${clientId}', '${name}')" class="btn-cmd" style="background:#8e44ad;">📝</button>
+                            ${isOnline ? `<button onclick="controlService('${clientId}', '${name}', 'stop')" class="btn-cmd" style="background:var(--danger);">🛑</button>` : ''}
+                        </div>
+                    </div>`;
         }
         listDiv.innerHTML = html;
     }
 
     function controlService(clientId, service, action) { 
         customConfirm(t('titleAction'), `${t('confOp')}<b>${service}</b>?`, "var(--accent)", async () => {
-            try { 
-                const res = await fetch('/api/service_control', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ clientId, service, action }) }); 
-                const data = await res.json(); 
+            try { const res = await fetch('/api/service_control', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ clientId, service, action }) }); const data = await res.json(); 
                 if(!data.success) customAlert(t('titleError'), "Error: " + data.error, true); 
             } catch(e) { console.error(e); } 
         });
@@ -1188,125 +915,44 @@
             try {
                 const res = await fetch('/api/config_file', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ clientId: currentEditClient, service: currentEditService, config_data: { "raw_text": textValue } }) });
                 const data = await res.json();
-                if (data.success) { 
-                    customAlert(t('titleSuccess'), "File updated!"); 
-                    closeEditorModal(); 
-                } else { 
-                    customAlert(t('titleError'), "Server error: " + data.error, true); 
-                    statusSpan.innerText = "❌ Error"; 
-                }
-            } catch(e) { 
-                customAlert(t('titleError'), t('msgNetErr'), true); 
-                statusSpan.innerText = "❌ Network Error"; 
-            }
+                if (data.success) { customAlert(t('titleSuccess'), "File updated!"); closeEditorModal(); } else { customAlert(t('titleError'), "Server error: " + data.error, true); statusSpan.innerText = "❌ Error"; }
+            } catch(e) { customAlert(t('titleError'), t('msgNetErr'), true); statusSpan.innerText = "❌ Network Error"; }
         });
     }
 
-    // --- FUNZIONE PER ISCRIVERSI ALLE PUSH ---
+    // --- PUSH NOTIFICATIONS ---
     async function subscribeToPush() {
         if (!('serviceWorker' in navigator)) return;
-
         const permission = await Notification.requestPermission();
-        if (permission !== 'granted') {
-            customAlert("Error", "Push notifications permission denied.", true);
-            return;
-        }
-
+        if (permission !== 'granted') { customAlert("Error", "Push notifications permission denied.", true); return; }
         try {
-            const reg = await navigator.serviceWorker.ready;
-            const res = await fetch('/api/vapid_public_key');
-            const { public_key } = await res.json();
-
-            const subscription = await reg.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlB64ToUint8Array(public_key)
-            });
-
-            await fetch('/api/subscribe', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(subscription)
-            });
-
-            customAlert("Success", "Push notifications enabled successfully!");
-            document.getElementById('push-btn').style.color = 'var(--success)';
-        } catch (e) {
-            console.error(e);
-            customAlert("Error", "Failed to enable notifications.", true);
-        }
+            const reg = await navigator.serviceWorker.ready; const res = await fetch('/api/vapid_public_key'); const { public_key } = await res.json();
+            const subscription = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8Array(public_key) });
+            await fetch('/api/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(subscription) });
+            customAlert("Success", "Push notifications enabled successfully!"); document.getElementById('push-btn').style.color = 'var(--success)';
+        } catch (e) { console.error(e); customAlert("Error", "Failed to enable notifications.", true); }
     }
-
-    // --- FUNZIONE PER CONTROLLARE IL COLORE DEL BOTTONE ---
     async function checkPushStatus() {
         if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-        
-        try {
-            const reg = await navigator.serviceWorker.ready;
-            const subscription = await reg.pushManager.getSubscription();
-            
-            const btn = document.getElementById('push-btn');
-            if (subscription && btn) {
-                btn.style.color = 'var(--success)';
-            }
-        } catch(e) {
-            console.error("Errore nel controllo stato Push:", e);
-        }
+        try { const reg = await navigator.serviceWorker.ready; const subscription = await reg.pushManager.getSubscription(); const btn = document.getElementById('push-btn'); if (subscription && btn) { btn.style.color = 'var(--success)'; } } catch(e) { console.error(e); }
     }
+    function urlB64ToUint8Array(base64String) { const padding = '='.repeat((4 - base64String.length % 4) % 4); const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/'); const rawData = window.atob(base64); const outputArray = new Uint8Array(rawData.length); for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i); return outputArray; }
 
-    // Helper per convertire la chiave VAPID
-    function urlB64ToUint8Array(base64String) {
-        const padding = '='.repeat((4 - base64String.length % 4) % 4);
-        const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-        const rawData = window.atob(base64);
-        const outputArray = new Uint8Array(rawData.length);
-        for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
-        return outputArray;
-    }
-
-    // AVVIO DELLA DASHBOARD
     initUI();
     checkPushStatus();
 
-    // --- MOTORE WEBSOCKET REAL-TIME ---
+    // --- WEBSOCKET REAL-TIME ---
     const socket = io();
-
-   // NUOVO LISTENER PER LO STATO MQTT
     socket.on('mqtt_status', function(data) {
         const badge = document.getElementById('mqtt-badge');
-        if (badge) {
-            if (data.connected) {
-                badge.innerText = "MQTT: ONLINE";
-                badge.className = "mqtt-badge mqtt-online";
-            } else {
-                badge.innerText = "MQTT: OFFLINE";
-                badge.className = "mqtt-badge mqtt-offline";
-            }
-        }
+        if (badge) { if (data.connected) { badge.innerText = "MQTT: ONLINE"; badge.className = "mqtt-badge mqtt-online"; } else { badge.innerText = "MQTT: OFFLINE"; badge.className = "mqtt-badge mqtt-offline"; } }
     });
-
-    socket.on('connect', () => {
-        console.log("🟢 Connesso al server via WebSocket in tempo reale!");
-        refreshStates(); 
-        refreshLogs();
-        refreshStats();
-    });
-
-    socket.on('dati_aggiornati', function() {
-        console.log("⚡ Rilevato nuovo traffico! Scatto istantaneo dell'interfaccia...");
-        refreshStates(); 
-        refreshLogs();
-        refreshStats();   
-    });
+    socket.on('connect', () => { refreshStates(); refreshLogs(); refreshStats(); });
+    socket.on('dati_aggiornati', function() { refreshStates(); refreshLogs(); refreshStats(); });
 </script>
 <script>
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js').then(reg => {
-                console.log('ServiceWorker registrato con successo!', reg.scope);
-            }).catch(err => {
-                console.log('Registrazione ServiceWorker fallita: ', err);
-            });
-        });
+        window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(err => { console.log('ServiceWorker fallita: ', err); }); });
     }
 </script>
 </body>
