@@ -49,13 +49,18 @@ The server acts as the brain of the network:
 
 ### 🚀 Installation Guide
 
-#### 1. System Pre-requisites (Critical)
+#### 0. System Pre-requisites (Critical)
 Before installing Python dependencies, install the necessary system compilers and pip/venv tools. On Debian/Ubuntu:
 ```bash
 sudo apt update
 sudo apt install build-essential python3-dev libssl-dev libffi-dev python3-pip python3-venv
 ```
-
+#### 1. Clone Repository
+Clone the repository into the /opt directory to ensure all systemd paths work correctly:
+```bash
+sudo git clone https://tuo-gitea.com/utente/fleet-control-server.git /opt/fleet-control-server
+cd /opt/fleet-control-server
+```
 #### 2. Virtual Environment Setup (Recommended)
 To prevent conflicts with OS packages (PEP 668), create an isolated environment:
 ```bash
@@ -129,13 +134,18 @@ Il server agisce da cervello della rete:
 
 ### 🚀 Guida all'Installazione
 
-#### 1. Requisiti di Sistema (Critici)
+#### 0. Requisiti di Sistema (Critici)
 Prima di installare le dipendenze Python, installa i compilatori di base e gli strumenti per gli ambienti virtuali. Su Debian/Ubuntu:
 ```bash
 sudo apt update
 sudo apt install build-essential python3-dev libssl-dev libffi-dev python3-pip python3-venv
 ```
-
+#### 1. Clonazione dei Repository
+Clona il repository nella cartella /opt per assicurarti che tutti i percorsi dei servizi systemd siano corretti:
+```bash
+sudo git clone https://tuo-gitea.com/utente/fleet-control-server.git /opt/fleet-control-server
+cd /opt/fleet-control-server
+```
 #### 2. Setup Ambiente Virtuale (Consigliato)
 Per evitare conflitti con i pacchetti di sistema (regola PEP 668), crea una "bolla" isolata:
 ```bash
