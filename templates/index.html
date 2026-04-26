@@ -78,11 +78,24 @@
         @keyframes pulse-red { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         
         /* Tabella LastHeard */
-        .table-container { background: var(--card-bg); border-radius: 6px; border: 1px solid var(--border-color); overflow: hidden; max-height: 400px; overflow-y: auto; margin: 0 20px 40px 20px; box-shadow: none; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; }
-        thead { background: var(--topbar-bg); position: sticky; top: 0; z-index: 1; border-bottom: 1px solid var(--border-color); }
-        th { padding: 12px 15px; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; color: var(--text-muted); }
-        td { padding: 10px 15px; border-bottom: 1px solid var(--border-color); color: var(--text-main); }
+        .table-container { 
+        background: var(--card-bg); 
+        border-radius: 6px; 
+        border: 1px solid var(--border-color); 
+        overflow-x: auto; /* <-- IL FIX: Permette lo scroll orizzontale */
+        overflow-y: auto; 
+        max-height: 400px; 
+        margin: 0 20px 40px 20px; 
+        box-shadow: none; 
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            text-align: left; 
+            font-size: 0.85rem; 
+            font-family: 'JetBrains Mono', monospace; 
+            white-space: nowrap; /* <-- Mantiene il testo su una riga per evitare accavallamenti su mobile */
+        }
         
         /* Animazioni Uniformate per i transiti */
         @keyframes pulse-border { 
