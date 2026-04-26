@@ -4,14 +4,14 @@
 
 ---
 
+![Dashboard Screenshot](images/dashboard.png)
+
 <a name="english"></a>
 ## 🇬🇧 English
 
 **Fleet Control Console** is a professional, real-time command and control (C2) dashboard designed for amateur radio repeater networks (MMDVM). This repository contains the **Server (Central Hub)** component, which provides a centralized web interface to monitor and manage a fleet of remote digital voice nodes (DMR, NXDN, YSF, P25).
 
 > ℹ️ **Note:** This is the Central Server repository. To monitor remote repeaters, you must install the [Fleet Control Agent](https://git.arifvg.it/iv3jdv/fleet-control-agent.git) on each node.
-
-![Dashboard Screenshot](images/dashboard.png)
 
 ### 🏗️ Architecture & Technology Stack
 The server acts as the brain of the network:
@@ -96,7 +96,7 @@ sudo systemctl start fleet-console
 
 **Fleet Control Console** è una dashboard di comando e controllo (C2) professionale in tempo reale, progettata per le reti di ripetitori radioamatoriali (MMDVM). Questo repository contiene il **Server (Central Hub)**, che fornisce un'interfaccia web centralizzata per monitorare e gestire una flotta di nodi digitali remoti (DMR, NXDN, YSF, P25).
 
-> ℹ️ **Nota:** Questo è il repository del Server Centrale. Per monitorare i ripetitori, devi installare il [Fleet Control Agent](link_al_repo_agent_qui) su ciascun nodo remoto.
+> ℹ️ **Nota:** Questo è il repository del Server Centrale. Per monitorare i ripetitori, devi installare il [Fleet Control Agent](https://git.arifvg.it/iv3jdv/fleet-control-agent.git) su ciascun nodo remoto.
 
 ### 🏗️ Architettura e Tecnologie
 Il server agisce da cervello della rete:
