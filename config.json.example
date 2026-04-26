@@ -3,7 +3,7 @@
         "broker": "your_mqtt_broker_address",
         "port": 1883,
         "user": "your_username",
-        "password": "your_password"
+        "password": "your_password",
     "client_id": "fleet_backend_prod"
     },
     "web_admin": {
