@@ -151,6 +151,7 @@ last_notified_errors = {}
 device_health = {}
 last_seen_reflector = {}
 network_mapping = {}  
+node_info = {}
 
 if os.path.exists(CACHE_FILE):
     try:
@@ -300,6 +301,25 @@ def on_message(client, userdata, msg):
                         
             except Exception as e:
                 logger.error(f"Error parsing DMRGateway for {cid}: {e}")
+        
+        # --- MMDVMHOST INFO MANAGEMENT (FREQUENZE) ---
+        elif len(parts) >= 4 and parts[0] == 'data' and parts[2].lower() == 'mmdvmhost' and parts[3].lower() == 'info':
+            try:
+                cid = parts[1].lower()
+                data = json.loads(payload)
+                tx = data.get("TXFrequency", "0")
+                rx = data.get("RXFrequency", "0")
+                
+                # Funzione per formattare gli Hz in MHz (es. 430500000 -> 430.500 MHz)
+                def format_freq(f):
+                    if str(f).isdigit() and int(f) > 0:
+                        return f"{int(f)/1000000:.3f} MHz"
+                    return str(f)
+                    
+                node_info[cid] = {"tx": format_freq(tx), "rx": format_freq(rx)}
+                socketio.emit('dati_aggiornati')  # <--- Aggiorna la UI in tempo reale
+            except Exception as e:
+                logger.error(f"Error parsing MMDVMHost info for {cid}: {e}")
 
         # --- OTHER GATEWAYS MANAGEMENT ---
         elif parts[0] in ['dmr-gateway', 'nxdn-gateway', 'ysf-gateway', 'p25-gateway', 'dstar-gateway']:
@@ -430,7 +450,8 @@ def get_states():
         "states": client_states,
         "telemetry": client_telemetry,
         "health": device_health,
-        "networks": network_mapping
+        "networks": network_mapping,
+        "info": node_info
     })
 
 @app.route('/api/stats')

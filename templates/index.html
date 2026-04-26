@@ -46,7 +46,12 @@
         
         /* Telemetria stile terminale */
         .health-bar { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; background: #010409; padding: 8px 12px; border-radius: 3px; margin-bottom: 15px; border: 1px solid var(--border-color); font-family: 'JetBrains Mono', monospace; }
-        
+
+        /* Frequenze Radio */
+        .freq-bar { display: flex; justify-content: space-around; font-size: 0.8rem; font-weight: 800; background: rgba(0,0,0,0.2); padding: 8px 10px; border-radius: 3px; margin-bottom: 15px; border: 1px dashed var(--border-color); font-family: 'JetBrains Mono', monospace; }
+        .freq-tx { color: #f87171; } /* Rosso per la TX */
+        .freq-rx { color: #4ade80; } /* Verde per la RX */
+
         /* Display Stato */
         .status-display { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 700; padding: 8px; border-radius: 3px; background: #010409; border: 1px solid var(--border-color); margin-bottom: 15px; color: var(--text-muted); }
         .card.online .status-display { color: var(--success); border-color: rgba(46, 160, 67, 0.4); }
@@ -582,12 +587,16 @@
                 let showReboot = (role === 'admin'); 
 
                 return `
-                    <div class="card" id="card-${c.id}">
+                        <div class="card" id="card-${c.id}">
                         <div class="card-header">
                             <span class="client-name" title="${c.name}">${c.name}</span>
                             <span class="badge-id">ID: ${c.id.toUpperCase()}</span>
                         </div>
-
+                        
+                        <div class="freq-bar" id="freq-container-${c.id}" style="display: none;">
+                            <span><span class="freq-tx">TX:</span> <span id="freq-tx-${c.id}">...</span></span>
+                            <span><span class="freq-rx">RX:</span> <span id="freq-rx-${c.id}">...</span></span>
+                        </div>
                         <div class="health-bar" id="health-${c.id}" style="display: none;">
                             <span>⚡ <span id="cpu-${c.id}">--</span>%</span>
                             <span>🌡️ <span id="temp-${c.id}">--</span>°C</span>
@@ -701,6 +710,20 @@
                 }
 
                 let healthObj = data.health && data.health[c.id.toLowerCase()];
+                let infoObj = data.info && data.info[c.id.toLowerCase()];
+                const freqContainer = document.getElementById(`freq-container-${c.id}`); 
+                const freqTx = document.getElementById(`freq-tx-${c.id}`); 
+                const freqRx = document.getElementById(`freq-rx-${c.id}`);
+
+                if (infoObj && isOnline) {
+                    if (freqContainer) {
+                        freqContainer.style.display = 'flex';
+                        freqTx.innerText = infoObj.tx;
+                        freqRx.innerText = infoObj.rx;
+                    }
+                } else { 
+                    if (freqContainer) freqContainer.style.display = 'none'; 
+                }
                 const healthContainer = document.getElementById(`health-${c.id}`); const cpuSpan = document.getElementById(`cpu-${c.id}`); const tempSpan = document.getElementById(`temp-${c.id}`); const ramSpan = document.getElementById(`ram-${c.id}`); const diskSpan = document.getElementById(`disk-${c.id}`);
 
                 if (healthObj && isOnline) {
