@@ -670,37 +670,55 @@ def global_cmd():
     return jsonify({"success": True})
 
 def auto_update_ids():
-    while True:
+    """Versione corretta: controlla all'avvio e poi ogni notte."""
+    
+    def download_logic():
         try:
+            # Usiamo esattamente i nomi e le URL definiti nel tuo config/codice
             with open(CONFIG_PATH, 'r') as f:
                 current_cfg = json.load(f)
-            target_time = current_cfg.get("update_schedule", "03:00")
+            
             urls = current_cfg.get("id_urls", {
                 "dmr": "https://radioid.net/static/users.csv",
                 "nxdn": "https://radioid.net/static/nxdn.csv"
             })
-            now = time.strftime("%H:%M")
-            if now == target_time:
-                logger.info(f">>> [AUTO-UPDATE] Scheduled time reached ({now}). Downloading...")
+            
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+            logger.info("📡 Inizio download database ID (DMR e NXDN)...")
+            
+            # Download DMR -> dmrid.dat
+            req_dmr = urllib.request.Request(urls["dmr"], headers=headers)
+            with urllib.request.urlopen(req_dmr) as response, open(DMR_IDS_PATH, 'wb') as out_file:
+                out_file.write(response.read())
                 
-                # Trucco: Camuffiamo Python da browser per bypassare i blocchi Cloudflare
-                headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+            # Download NXDN -> nxdn.csv
+            req_nxdn = urllib.request.Request(urls["nxdn"], headers=headers)
+            with urllib.request.urlopen(req_nxdn) as response, open(NXDN_IDS_PATH, 'wb') as out_file:
+                out_file.write(response.read())
                 
-                # Download DMR
-                req_dmr = urllib.request.Request(urls["dmr"], headers=headers)
-                with urllib.request.urlopen(req_dmr) as response, open(DMR_IDS_PATH, 'wb') as out_file:
-                    out_file.write(response.read())
-                    
-                # Download NXDN
-                req_nxdn = urllib.request.Request(urls["nxdn"], headers=headers)
-                with urllib.request.urlopen(req_nxdn) as response, open(NXDN_IDS_PATH, 'wb') as out_file:
-                    out_file.write(response.read())
-                    
-                load_ids()
-                logger.info(f">>> [AUTO-UPDATE] Completed successfully.")
-                time.sleep(65) 
+            load_ids()
+            logger.info("✅ Aggiornamento completato con successo.")
         except Exception as e:
-            logger.error(f">>> [AUTO-UPDATE] Error: {e}")
+            logger.error(f"❌ Errore durante il download: {e}")
+
+    # --- CONTROLLO INIZIALE ALL'AVVIO ---
+    if not os.path.exists(DMR_IDS_PATH) or not os.path.exists(NXDN_IDS_PATH):
+        logger.info("🔍 File ID mancanti. Avvio download immediato...")
+        download_logic()
+
+    # --- CICLO NOTTURNO ---
+    while True:
+        try:
+            now = time.strftime("%H:%M")
+            with open(CONFIG_PATH, 'r') as f:
+                target_time = json.load(f).get("update_schedule", "03:00")
+            
+            if now == target_time:
+                logger.info(f"⏰ Orario programmato ({target_time}) raggiunto. Aggiorno...")
+                download_logic()
+                time.sleep(65)
+        except Exception as e:
+            logger.error(f"⚠️ Errore nel thread update: {e}")
         time.sleep(30)
 
 @app.route('/api/ui_config', methods=['GET'])
