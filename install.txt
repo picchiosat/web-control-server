@@ -10,7 +10,7 @@ system compilers and development libraries.
 
 Debian/Ubuntu:
    sudo apt update
-   sudo apt install build-essential python3-dev libssl-dev libffi-dev
+   sudo apt install build-essential python3-dev python3-pip libssl-dev libffi-dev
 
 Upgrade base pip tools:
    pip install --upgrade pip setuptools wheel
