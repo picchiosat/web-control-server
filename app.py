@@ -104,8 +104,12 @@ def load_ids():
     if os.path.exists(DMR_IDS_PATH):
         with open(DMR_IDS_PATH, 'r', encoding='utf-8', errors='ignore') as f:
             for l in f:
-                sep = '\t' if '\t' in l else (',' if ',' in l else ';')
-                p = l.strip().split(sep)
+                l = l.replace('"', '') # Rimuove eventuali virgolette
+                if ',' in l: p = l.strip().split(',')
+                elif '\t' in l: p = l.strip().split('\t')
+                elif ';' in l: p = l.strip().split(';')
+                else: p = l.strip().split() # Cerca gli spazi normali
+                
                 if len(p) >= 2 and p[0].strip().isdigit(): 
                     user_db[p[0].strip()] = p[1].strip()
                     
@@ -647,14 +651,26 @@ def auto_update_ids():
                 current_cfg = json.load(f)
             target_time = current_cfg.get("update_schedule", "03:00")
             urls = current_cfg.get("id_urls", {
-                "dmr": "https://radioid.net/static/dmrid.dat",
+                "dmr": "https://radioid.net/static/users.csv",
                 "nxdn": "https://radioid.net/static/nxdn.csv"
             })
             now = time.strftime("%H:%M")
             if now == target_time:
                 logger.info(f">>> [AUTO-UPDATE] Scheduled time reached ({now}). Downloading...")
-                urllib.request.urlretrieve(urls["dmr"], DMR_IDS_PATH)
-                urllib.request.urlretrieve(urls["nxdn"], NXDN_IDS_PATH)
+                
+                # Trucco: Camuffiamo Python da browser per bypassare i blocchi Cloudflare
+                headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+                
+                # Download DMR
+                req_dmr = urllib.request.Request(urls["dmr"], headers=headers)
+                with urllib.request.urlopen(req_dmr) as response, open(DMR_IDS_PATH, 'wb') as out_file:
+                    out_file.write(response.read())
+                    
+                # Download NXDN
+                req_nxdn = urllib.request.Request(urls["nxdn"], headers=headers)
+                with urllib.request.urlopen(req_nxdn) as response, open(NXDN_IDS_PATH, 'wb') as out_file:
+                    out_file.write(response.read())
+                    
                 load_ids()
                 logger.info(f">>> [AUTO-UPDATE] Completed successfully.")
                 time.sleep(65) 
