@@ -33,6 +33,10 @@ The server acts as the brain of the network:
   * A critical system daemon crashes (Auto-healing failed).
 * Works securely even when the web app is closed or in the background.
 
+### ⚠️ Security Requirement: HTTPS
+Please note that **Web Push Notifications** and the **Service Worker** require a secure connection to function. For security reasons, modern browsers only enable these features over **HTTPS**. If you are accessing the console via HTTP (outside of `localhost`), the "Push" button and notification registration will not work. We recommend using a reverse proxy (like Nginx, Caddy, or Traefik) with an SSL certificate.
+**Pro Tip:** You can use Let's Encrypt to get a free SSL certificate for your domain.
+
 #### 🛠️ Advanced Remote Control & Maintenance
 * **Remote .INI Editor:** Edit daemon configuration files (e.g., MMDVMHost.ini) directly from the web interface without SSH access.
 * **Service Management:** Start, Stop, or Restart remote system daemons with a single click.
@@ -117,6 +121,10 @@ Il server agisce da cervello della rete:
   * Un nodo va offline o torna operativo.
   * Un demone di sistema remoto si blocca (fallimento auto-healing).
 * Funzionano in modo sicuro anche quando la web app è chiusa o in background.
+
+### ⚠️ Sicurezza Richiesta: HTTPS
+Si prega di notare che le **Notifiche Web Push** e il **Service Worker** richiedono una connessione sicura per funzionare. Per motivi di sicurezza, i browser moderni abilitano queste funzionalità solo su **HTTPS**. Se accedi alla console via HTTP (al di fuori di `localhost`), il tasto "Push" e la registrazione delle notifiche non saranno attivi. Si consiglia l'uso di un reverse proxy (come Nginx, Caddy o Traefik) con certificato SSL.
+**Suggerimento:** Puoi usare Let's Encrypt per ottenere un certificato SSL gratuito per il tuo dominio.
 
 #### 🛠️ Controllo Remoto & Manutenzione Avanzata
 * **Editor .INI Remoto:** Modifica i file di configurazione (es. MMDVMHost.ini) direttamente dal pannello web, senza bisogno di accessi SSH.
