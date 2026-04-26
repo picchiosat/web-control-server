@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=root
 # Assicurati che questo sia il percorso esatto della cartella del tuo progetto
-WorkingDirectory=/opt/web-control-server
+WorkingDirectory=/opt/fleet-control-server
 # PUNTA AL GUNICORN DENTRO IL VENV!
 ExecStart=/opt/web-control-server/venv/bin/gunicorn -k "geventwebsocket.gunicorn.workers.GeventWebSocketWorker" -w 1 --graceful-timeout 2 --bind 0.0.0.0:9000 app:app
 TimeoutStopSec=3
