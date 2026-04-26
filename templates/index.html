@@ -800,7 +800,7 @@
                     let timeSinceTx = Date.now() - (parseInt(cardDiv.dataset.lastTx) || 0);
                     
                     // Accendi se in TX, OPPURE se in Hang Time (ma spegni a forza dopo 30 secondi di inattività)
-                    let showActiveColor = isTx || (!isIdle && timeSinceTx < 30000); 
+                    let showActiveColor = isTx || (!isIdle && timeSinceTx < 180000); 
 
                     cardDiv.style.setProperty('border-top-color', showActiveColor ? activeModeColor : "var(--border-color)", 'important');
                     // --- FINE LOGICA ---
