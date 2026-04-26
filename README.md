@@ -64,7 +64,7 @@ cd /opt/fleet-control-server
 #### 2. Virtual Environment Setup (Recommended)
 To prevent conflicts with OS packages (PEP 668), create an isolated environment:
 ```bash
-cd /opt/web-control-server
+cd /opt/fleet-control-server
 python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip setuptools wheel
@@ -149,7 +149,7 @@ cd /opt/fleet-control-server
 #### 2. Setup Ambiente Virtuale (Consigliato)
 Per evitare conflitti con i pacchetti di sistema (regola PEP 668), crea una "bolla" isolata:
 ```bash
-cd /opt/web-control-server
+cd /opt/fleet-control-server
 python3 -m venv venv
 source venv/bin/activate
 pip install --upgrade pip setuptools wheel
