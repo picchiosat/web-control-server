@@ -381,8 +381,13 @@ mqtt_backend.username_pw_set(config['mqtt']['user'], config['mqtt']['password'])
 mqtt_backend.on_connect = on_connect
 mqtt_backend.on_disconnect = on_disconnect
 mqtt_backend.on_message = on_message
-mqtt_backend.connect(config['mqtt']['broker'], config['mqtt']['port'])
-mqtt_backend.loop_start()
+try:
+    # Usiamo connect_async! Non blocca il server se l'IP è irraggiungibile
+    mqtt_backend.connect_async(config['mqtt']['broker'], config['mqtt']['port'])
+    mqtt_backend.loop_start()
+    logger.info(f"Avvio connessione MQTT asincrona verso {config['mqtt']['broker']}...")
+except Exception as e:
+    logger.error(f"Errore critico nell'inizializzazione MQTT: {e}")
 
 @app.route('/')
 def index(): return render_template('index.html')
