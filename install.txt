@@ -51,12 +51,17 @@ They will NOT work over standard HTTP.
 ------------------------------------------------------------
 4. RUNNING AS A SERVICE (SYSTEMD)
 ------------------------------------------------------------
-NOTE: Make sure your fleet-console.service file points to 
-the executable inside the venv (e.g., ExecStart=/opt/web-control-server/venv/bin/gunicorn ...)
+⚠️ IMPORTANT (VENV USERS): Before copying the service file, 
+open 'fleet-control.service' and ensure the paths point to your 
+virtual environment.
+
+Example:
+WorkingDirectory=/opt/web-control-server
+ExecStart=/opt/web-control-server/venv/bin/gunicorn -k ...
 
 Configuration:
 1. Copy .service file to '/etc/systemd/system/':
-   sudo cp fleet-console.service /etc/systemd/system/
+   sudo cp fleet-control.service /etc/systemd/system/
 2. Reload systemd: sudo systemctl daemon-reload
 3. Enable on boot: sudo systemctl enable fleet-console
 4. Start service:  sudo systemctl start fleet-console
@@ -106,12 +111,18 @@ Passaggi:
 3. Imposta 'vapid_claim_email' (es. "mailto:tua@email.com").
 
 ------------------------------------------------------------
-4. ESECUZIONE COME SERVIZIO
+4. ESECUZIONE COME SERVIZIO (SYSTEMD)
 ------------------------------------------------------------
-NOTA BENE: Assicurati che il file fleet-console.service 
-punti all'eseguibile dentro il venv (es: ExecStart=/opt/web-control-server/venv/bin/gunicorn ...)
+⚠️ IMPORTANTE (PER UTENTI VENV): Prima di copiare il file di 
+servizio, apri 'fleet-control.service' e assicurati che i percorsi 
+puntino al tuo ambiente virtuale!
 
-1. sudo cp fleet-console.service /etc/systemd/system/
-2. sudo systemctl daemon-reload
-3. sudo systemctl enable fleet-console
-4. sudo systemctl start fleet-console
+Esempio:
+WorkingDirectory=/opt/web-control-server
+ExecStart=/opt/web-control-server/venv/bin/gunicorn -k ...
+
+Passaggi:
+1. Copia il file in systemd: sudo cp fleet-control.service /etc/systemd/system/
+2. Ricarica la configurazione: sudo systemctl daemon-reload
+3. Abilita all'avvio: sudo systemctl enable fleet-console
+4. Avvia il servizio: sudo systemctl start fleet-console
