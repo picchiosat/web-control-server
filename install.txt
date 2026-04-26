@@ -61,7 +61,7 @@ ExecStart=/opt/fleet-control-server/venv/bin/gunicorn -k ...
 
 Configuration:
 1. Copy .service file to '/etc/systemd/system/':
-   sudo cp fleet-control.service /etc/systemd/system/
+   sudo cp fleet-console.service /etc/systemd/system/
 2. Reload systemd: sudo systemctl daemon-reload
 3. Enable on boot: sudo systemctl enable fleet-console
 4. Start service:  sudo systemctl start fleet-console
@@ -122,7 +122,7 @@ WorkingDirectory=/opt/fleet-control-server
 ExecStart=/opt/fleet-control-server/venv/bin/gunicorn -k ...
 
 Passaggi:
-1. Copia il file in systemd: sudo cp fleet-control.service /etc/systemd/system/
+1. Copia il file in systemd: sudo cp fleet-console.service /etc/systemd/system/
 2. Ricarica la configurazione: sudo systemctl daemon-reload
 3. Abilita all'avvio: sudo systemctl enable fleet-console
 4. Avvia il servizio: sudo systemctl start fleet-console

@@ -80,10 +80,10 @@ pip install -r requirements.txt
 #### 4. Running as a Service
 To run the server continuously in production using Gunicorn:
 ```bash
-sudo cp fleet-control.service /etc/systemd/system/
+sudo cp fleet-console.service /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable fleet-control
-sudo systemctl start fleet-control
+sudo systemctl enable fleet-console
+sudo systemctl start fleet-console
 ```
 *(Ensure the `.service` file points to the `gunicorn` executable inside your `venv`)*.
 
@@ -165,10 +165,10 @@ pip install -r requirements.txt
 #### 4. Esecuzione come Servizio (systemd)
 Per eseguire il server in produzione in modo continuo e stabile con Gunicorn:
 ```bash
-sudo cp fleet-control.service /etc/systemd/system/
+sudo cp fleet-console.service /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable fleet-control
-sudo systemctl start fleet-control
+sudo systemctl enable fleet-console
+sudo systemctl start fleet-console
 ```
 *(Assicurati che il file `.service` punti all'eseguibile `gunicorn` situato all'interno della cartella `venv`).*
 
