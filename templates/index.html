@@ -794,7 +794,16 @@
 
                 if (isOnline) {
                     cardDiv.classList.add('online'); statusDiv.classList.remove('status-offline'); cardDiv.style.opacity = "1"; cardDiv.style.filter = "none";
-                    cardDiv.style.setProperty('border-top-color', (!isTx && isIdle) ? "var(--border-color)" : activeModeColor, 'important');
+                    
+                    // --- INIZIO LOGICA SMART HANG-TIME ---
+                    if (isTx) cardDiv.dataset.lastTx = Date.now(); // Memorizza quando è avvenuto l'ultimo TX
+                    let timeSinceTx = Date.now() - (parseInt(cardDiv.dataset.lastTx) || 0);
+                    
+                    // Accendi se in TX, OPPURE se in Hang Time (ma spegni a forza dopo 30 secondi di inattività)
+                    let showActiveColor = isTx || (!isIdle && timeSinceTx < 30000); 
+
+                    cardDiv.style.setProperty('border-top-color', showActiveColor ? activeModeColor : "var(--border-color)", 'important');
+                    // --- FINE LOGICA ---
                     if(isTx) {
                         let shadowRGB = '59, 130, 246'; 
                         if (activeModeColor === '#10b981') shadowRGB = '16, 185, 129'; 
