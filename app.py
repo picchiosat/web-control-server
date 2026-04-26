@@ -302,22 +302,33 @@ def on_message(client, userdata, msg):
             except Exception as e:
                 logger.error(f"Error parsing DMRGateway for {cid}: {e}")
         
-        # --- MMDVMHOST INFO MANAGEMENT (FREQUENZE) ---
         elif len(parts) >= 4 and parts[0] == 'data' and parts[2].lower() == 'mmdvmhost' and parts[3].lower() == 'info':
             try:
                 cid = parts[1].lower()
                 data = json.loads(payload)
+                
+                # Estrazione dati
                 tx = data.get("TXFrequency", "0")
                 rx = data.get("RXFrequency", "0")
+                lat = data.get("Latitude", "0.0")
+                lon = data.get("Longitude", "0.0")
+                loc = data.get("Location", "Sconosciuta")
                 
-                # Funzione per formattare gli Hz in MHz (es. 430500000 -> 430.500 MHz)
+                # Funzione per formattare gli Hz in MHz
                 def format_freq(f):
                     if str(f).isdigit() and int(f) > 0:
                         return f"{int(f)/1000000:.3f} MHz"
                     return str(f)
                     
-                node_info[cid] = {"tx": format_freq(tx), "rx": format_freq(rx)}
-                socketio.emit('dati_aggiornati')  # <--- Aggiorna la UI in tempo reale
+                # Salvataggio nel dizionario globale
+                node_info[cid] = {
+                    "tx": format_freq(tx), 
+                    "rx": format_freq(rx),
+                    "lat": lat,
+                    "lon": lon,
+                    "loc": loc
+                }
+                socketio.emit('dati_aggiornati')
             except Exception as e:
                 logger.error(f"Error parsing MMDVMHost info for {cid}: {e}")
 

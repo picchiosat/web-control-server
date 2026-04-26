@@ -52,6 +52,10 @@
         .freq-tx { color: #f87171; } /* Rosso per la TX */
         .freq-rx { color: #4ade80; } /* Verde per la RX */
 
+        /* Metadati Nodo (Location, Coordinate) */
+        .node-meta { font-size: 0.75rem; color: #8b949e; text-align: center; margin-bottom: 15px; line-height: 1.4; }
+        .node-meta-item { display: block; }
+
         /* Display Stato */
         .status-display { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 700; padding: 8px; border-radius: 3px; background: #010409; border: 1px solid var(--border-color); margin-bottom: 15px; color: var(--text-muted); }
         .card.online .status-display { color: var(--success); border-color: rgba(46, 160, 67, 0.4); }
@@ -592,10 +596,13 @@
                             <span class="client-name" title="${c.name}">${c.name}</span>
                             <span class="badge-id">ID: ${c.id.toUpperCase()}</span>
                         </div>
-                        
                         <div class="freq-bar" id="freq-container-${c.id}" style="display: none;">
                             <span><span class="freq-tx">TX:</span> <span id="freq-tx-${c.id}">...</span></span>
                             <span><span class="freq-rx">RX:</span> <span id="freq-rx-${c.id}">...</span></span>
+                        </div>
+                        <div class="node-meta" id="meta-container-${c.id}" style="display: none;">
+                            <span class="node-meta-item">📍 <strong id="loc-${c.id}">...</strong></span>
+                            <span class="node-meta-item">Lat: <span id="lat-${c.id}">...</span> | Lon: <span id="lon-${c.id}">...</span></span>
                         </div>
                         <div class="health-bar" id="health-${c.id}" style="display: none;">
                             <span>⚡ <span id="cpu-${c.id}">--</span>%</span>
@@ -710,10 +717,15 @@
                 }
 
                 let healthObj = data.health && data.health[c.id.toLowerCase()];
+                // --- INIZIO BLOCCO INFO AGGIUNTIVE (FREQ + LOC) ---
                 let infoObj = data.info && data.info[c.id.toLowerCase()];
                 const freqContainer = document.getElementById(`freq-container-${c.id}`); 
                 const freqTx = document.getElementById(`freq-tx-${c.id}`); 
                 const freqRx = document.getElementById(`freq-rx-${c.id}`);
+                const metaContainer = document.getElementById(`meta-container-${c.id}`);
+                const locSpan = document.getElementById(`loc-${c.id}`);
+                const latSpan = document.getElementById(`lat-${c.id}`);
+                const lonSpan = document.getElementById(`lon-${c.id}`);
 
                 if (infoObj && isOnline) {
                     if (freqContainer) {
@@ -721,9 +733,17 @@
                         freqTx.innerText = infoObj.tx;
                         freqRx.innerText = infoObj.rx;
                     }
+                    if (metaContainer) {
+                        metaContainer.style.display = 'block';
+                        locSpan.innerText = infoObj.loc;
+                        latSpan.innerText = infoObj.lat;
+                        lonSpan.innerText = infoObj.lon;
+                    }
                 } else { 
                     if (freqContainer) freqContainer.style.display = 'none'; 
+                    if (metaContainer) metaContainer.style.display = 'none'; 
                 }
+                // --- FINE BLOCCO INFO AGGIUNTIVE ---
                 const healthContainer = document.getElementById(`health-${c.id}`); const cpuSpan = document.getElementById(`cpu-${c.id}`); const tempSpan = document.getElementById(`temp-${c.id}`); const ramSpan = document.getElementById(`ram-${c.id}`); const diskSpan = document.getElementById(`disk-${c.id}`);
 
                 if (healthObj && isOnline) {
