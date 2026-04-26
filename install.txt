@@ -13,7 +13,7 @@ Debian/Ubuntu:
    sudo apt install build-essential python3-dev libssl-dev libffi-dev python3-pip python3-venv
 
 Create and activate a virtual environment (CRITICAL on Debian 12+):
-   cd /opt/web-control-server
+   cd /opt/fleet-control-server
    python3 -m venv venv
    source venv/bin/activate
 
