@@ -152,6 +152,7 @@ device_health = {}
 last_seen_reflector = {}
 network_mapping = {}  
 node_info = {}
+node_general = {}
 
 if os.path.exists(CACHE_FILE):
     try:
@@ -301,7 +302,8 @@ def on_message(client, userdata, msg):
                         
             except Exception as e:
                 logger.error(f"Error parsing DMRGateway for {cid}: {e}")
-        
+
+        # --- MMDVMHOST INFO MANAGEMENT (FREQUENZE & LOCATION) ---
         elif len(parts) >= 4 and parts[0] == 'data' and parts[2].lower() == 'mmdvmhost' and parts[3].lower() == 'info':
             try:
                 cid = parts[1].lower()
@@ -331,6 +333,20 @@ def on_message(client, userdata, msg):
                 socketio.emit('dati_aggiornati')
             except Exception as e:
                 logger.error(f"Error parsing MMDVMHost info for {cid}: {e}")
+
+        # --- MMDVMHOST GENERAL MANAGEMENT (CALLSIGN & ID) ---
+        elif len(parts) >= 4 and parts[0] == 'data' and parts[2].lower() == 'mmdvmhost' and parts[3].lower() == 'general':
+            try:
+                cid = parts[1].lower()
+                data = json.loads(payload)
+                callsign = data.get("Callsign", "")
+                radio_id = data.get("Id", "")
+                
+                if callsign:
+                    node_general[cid] = {"callsign": callsign, "radio_id": radio_id}
+                    socketio.emit('dati_aggiornati')
+            except Exception as e:
+                logger.error(f"Error parsing MMDVMHost general for {cid}: {e}")
 
         # --- OTHER GATEWAYS MANAGEMENT ---
         elif parts[0] in ['dmr-gateway', 'nxdn-gateway', 'ysf-gateway', 'p25-gateway', 'dstar-gateway']:
@@ -462,7 +478,8 @@ def get_states():
         "telemetry": client_telemetry,
         "health": device_health,
         "networks": network_mapping,
-        "info": node_info
+        "info": node_info,
+        "general": node_general
     })
 
 @app.route('/api/stats')

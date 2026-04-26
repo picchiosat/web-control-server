@@ -670,10 +670,31 @@
                 const statusDiv = document.getElementById(`status-${c.id}`); const cardDiv = document.getElementById(`card-${c.id}`);
                 if (!statusDiv || !cardDiv) return;
 
+                // 1. PRIMA CALCOLIAMO SE È ONLINE
                 let stateValue = data.states[c.id.toLowerCase()] || data.states[c.id] || "OFFLINE";
                 stateValue = String(stateValue).trim().toUpperCase(); statusDiv.innerText = stateValue;
                 const isOnline = !stateValue.includes("OFF") && stateValue !== "";
 
+                // 2. POI AGGIORNIAMO NOME E ID DINAMICI
+                let genObj = data.general && data.general[c.id.toLowerCase()];
+                const nameSpan = cardDiv.querySelector('.client-name');
+                const idBadge = cardDiv.querySelector('.badge-id');
+
+                if (genObj && isOnline) {
+                    nameSpan.innerText = genObj.callsign;
+                    idBadge.innerText = `ID: ${genObj.radio_id}`;
+                    idBadge.style.background = "var(--primary)"; 
+                    idBadge.style.color = "#ffffff"; // <--- FORZA IL TESTO BIANCO
+                    idBadge.style.borderColor = "var(--primary)"; // <--- ADATTA IL BORDO
+                } else {
+                    nameSpan.innerText = c.name;
+                    idBadge.innerText = `ID: ${c.id.toUpperCase()}`;
+                    idBadge.style.background = "rgba(255,255,255,0.1)";
+                    idBadge.style.color = "var(--text-muted)"; // <--- RIPRISTINA IL GRIGIO
+                    idBadge.style.borderColor = "var(--border-color)";
+                }
+
+                // 3. TELEMETRIA E STATO (PULITO DAI DUPLICATI)
                 let telemetryObj = data.telemetry[c.id.toLowerCase()] || data.telemetry[c.id] || { ts1: "...", ts2: "...", alt: "", idle: true };
                 if (typeof telemetryObj === 'string') telemetryObj = { ts1: telemetryObj, ts2: "...", alt: "", idle: true };
 
@@ -717,7 +738,6 @@
                 }
 
                 let healthObj = data.health && data.health[c.id.toLowerCase()];
-                // --- INIZIO BLOCCO INFO AGGIUNTIVE (FREQ + LOC) ---
                 let infoObj = data.info && data.info[c.id.toLowerCase()];
                 const freqContainer = document.getElementById(`freq-container-${c.id}`); 
                 const freqTx = document.getElementById(`freq-tx-${c.id}`); 
@@ -743,7 +763,7 @@
                     if (freqContainer) freqContainer.style.display = 'none'; 
                     if (metaContainer) metaContainer.style.display = 'none'; 
                 }
-                // --- FINE BLOCCO INFO AGGIUNTIVE ---
+
                 const healthContainer = document.getElementById(`health-${c.id}`); const cpuSpan = document.getElementById(`cpu-${c.id}`); const tempSpan = document.getElementById(`temp-${c.id}`); const ramSpan = document.getElementById(`ram-${c.id}`); const diskSpan = document.getElementById(`disk-${c.id}`);
 
                 if (healthObj && isOnline) {
