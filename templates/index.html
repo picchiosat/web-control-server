@@ -113,6 +113,17 @@
             border-bottom: 2px solid var(--primary);
         }
 
+        /* Regole principali della Tabella */
+        table { 
+            width: 100%; 
+            min-width: 100%; /* Forza la tabella a riempire lo schermo sul PC */
+            border-collapse: collapse; 
+            text-align: left; 
+            font-size: 0.85rem; 
+            font-family: 'JetBrains Mono', monospace; 
+            white-space: nowrap; /* Impedisce al testo di andare a capo sul cellulare */
+        }
+
         /* Spaziatura celle e righe tabella */
         th, td { 
             padding: 12px 16px;      /* Aumenta lo spazio interno: 12px sopra/sotto, 16px ai lati */
