@@ -4,6 +4,7 @@
         "port": 1883,
         "user": "your_username",
         "password": "your_password"
+    "client_id": "fleet_backend_prod"
     },
     "web_admin": {
         "default_user": "admin",

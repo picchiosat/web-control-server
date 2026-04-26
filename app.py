@@ -373,7 +373,10 @@ def on_message(client, userdata, msg):
         logger.error(f"MQTT MSG ERROR: {e}")
 
 # --- MQTT CLIENT INITIALIZATION ---
-mqtt_backend = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2, "flask_backend")
+# Recuperiamo l'ID dal config. Se per caso manca, usiamo un default di emergenza.
+mqtt_id = config['mqtt'].get('client_id', 'flask_backend_generic')
+
+mqtt_backend = mqtt_client.Client(mqtt_client.CallbackAPIVersion.VERSION2, mqtt_id)
 mqtt_backend.username_pw_set(config['mqtt']['user'], config['mqtt']['password'])
 mqtt_backend.on_connect = on_connect
 mqtt_backend.on_disconnect = on_disconnect
