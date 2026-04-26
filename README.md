@@ -13,7 +13,7 @@
 
 ### 🤖 Remote Agent
 To monitor your remote nodes (Raspberry Pi), download the dedicated lightweight agent here:
-`[https://git.arifvg.it/iv3jdv/web-console-agent.git]`
+`https://git.arifvg.it/iv3jdv/web-console-agent.git`
 
 ### ✨ Features
 * **Zero-Latency Real-Time UI:** Powered by WebSockets (Socket.IO).
@@ -85,7 +85,7 @@ Configuration:
 
 ### 🤖 Agente Remoto
 Per monitorare i tuoi nodi remoti (Raspberry Pi), scarica l'agente dedicato qui:
-`[https://git.arifvg.it/iv3jdv/web-console-agent.git]`
+`https://git.arifvg.it/iv3jdv/web-console-agent.git`
 
 ### ✨ Funzionalità
 * **Interfaccia Real-Time a Latenza Zero** tramite WebSockets.
