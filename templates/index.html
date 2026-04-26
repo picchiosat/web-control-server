@@ -97,6 +97,27 @@
             white-space: nowrap; /* <-- Mantiene il testo su una riga per evitare accavallamenti su mobile */
         }
         
+        /* Spaziatura celle e righe tabella */
+        th, td { 
+            padding: 12px 16px;      /* Aumenta lo spazio interno: 12px sopra/sotto, 16px ai lati */
+            border-bottom: 1px solid var(--border-color); 
+            line-height: 1.6;        /* Aumenta l'interlinea del testo */
+            vertical-align: middle; 
+        }
+
+        /* Stile distinto per l'intestazione */
+        th {
+            background-color: rgba(255, 255, 255, 0.03); 
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Effetto "Zebra" per facilitare la lettura orizzontale */
+        tbody tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.015);
+        }
+
         /* Animazioni Uniformate per i transiti */
         @keyframes pulse-border { 
             0% { border-color: var(--border-color); } 
