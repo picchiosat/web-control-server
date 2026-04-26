@@ -77,26 +77,42 @@
         .mqtt-offline { background: rgba(218, 54, 51, 0.1); color: var(--danger); border-color: var(--danger); animation: pulse-red 2s infinite; }
         @keyframes pulse-red { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         
-        /* Tabella LastHeard */
+        /* Container della tabella con scroll fluido */
         .table-container { 
-        background: var(--card-bg); 
-        border-radius: 6px; 
-        border: 1px solid var(--border-color); 
-        overflow-x: auto; /* <-- IL FIX: Permette lo scroll orizzontale */
-        overflow-y: auto; 
-        max-height: 400px; 
-        margin: 0 20px 40px 20px; 
-        box-shadow: none; 
+            background: var(--card-bg); 
+            border-radius: 8px; 
+            border: 1px solid var(--border-color); 
+            overflow-x: auto; 
+            overflow-y: auto; 
+            max-height: 500px; /* Un po' più alto per vedere più log */
+            margin: 0 20px 40px 20px; 
+            
+            /* FIX PRO: Scroll fluido su iPhone/Android */
+            -webkit-overflow-scrolling: touch; 
         }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            text-align: left; 
-            font-size: 0.85rem; 
-            font-family: 'JetBrains Mono', monospace; 
-            white-space: nowrap; /* <-- Mantiene il testo su una riga per evitare accavallamenti su mobile */
+
+        /* Ottimizzazione per schermi piccoli (Smartphone) */
+        @media (max-width: 600px) {
+            .table-container {
+                margin: 0 10px 20px 10px; /* Riduciamo i margini laterali per dare più spazio ai dati */
+                border-radius: 4px;        /* Angoli leggermente più secchi */
+            }
+            
+            th, td {
+                padding: 10px 12px;        /* Compattiamo leggermente solo su mobile per non far scorrere troppo */
+                font-size: 0.75rem;        /* Testo leggermente più piccolo per far stare più info */
+            }
         }
         
+        /* Testata fissa (Sticky) */
+        thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #1c2128; /* Un colore solido per non far vedere le righe sotto mentre scorri */
+            border-bottom: 2px solid var(--primary);
+        }
+
         /* Spaziatura celle e righe tabella */
         th, td { 
             padding: 12px 16px;      /* Aumenta lo spazio interno: 12px sopra/sotto, 16px ai lati */
