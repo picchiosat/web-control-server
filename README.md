@@ -55,16 +55,16 @@ Please note that **Web Push Notifications** and the **Service Worker** require a
 
 ### 🚀 Installation Guide
 
-#### 0. System Pre-requisites (Critical)
-Before installing Python dependencies, install the necessary system compilers and pip/venv tools. On Debian/Ubuntu:
+#### 0. Root Privileges
+All installation steps must be executed as the `root` user. Before starting, elevate your privileges by running:
 ```bash
-sudo apt update
-sudo apt install build-essential python3-dev libssl-dev libffi-dev python3-pip python3-venv
+apt update
+apt install build-essential python3-dev libssl-dev libffi-dev python3-pip python3-venv
 ```
 #### 1. Clone Repository
 Clone the repository into the /opt directory to ensure all systemd paths work correctly:
 ```bash
-sudo git clone https://tuo-gitea.com/utente/fleet-control-server.git /opt/fleet-control-server
+git clone https://tuo-gitea.com/utente/fleet-control-server.git /opt/fleet-control-server
 cd /opt/fleet-control-server
 ```
 #### 2. Virtual Environment Setup (Recommended)
@@ -86,10 +86,10 @@ pip install -r requirements.txt
 #### 4. Running as a Service
 To run the server continuously in production using Gunicorn:
 ```bash
-sudo cp fleet-console.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable fleet-console
-sudo systemctl start fleet-console
+cp fleet-console.service /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable fleet-console
+systemctl start fleet-console
 ```
 *(Ensure the `.service` file points to the `gunicorn` executable inside your `venv`)*.
 
@@ -144,16 +144,16 @@ Si prega di notare che le **Notifiche Web Push** e il **Service Worker** richied
 
 ### 🚀 Guida all'Installazione
 
-#### 0. Requisiti di Sistema (Critici)
-Prima di installare le dipendenze Python, installa i compilatori di base e gli strumenti per gli ambienti virtuali. Su Debian/Ubuntu:
+#### 0. Privilegi di Root
+Tutti i passaggi di installazione devono essere eseguiti come utente `root`. Prima di iniziare, eleva i tuoi privilegi eseguendo:
 ```bash
-sudo apt update
-sudo apt install build-essential python3-dev libssl-dev libffi-dev python3-pip python3-venv
+apt update
+apt install build-essential python3-dev libssl-dev libffi-dev python3-pip python3-venv
 ```
 #### 1. Clonazione dei Repository
 Clona il repository nella cartella /opt per assicurarti che tutti i percorsi dei servizi systemd siano corretti:
 ```bash
-sudo git clone https://tuo-gitea.com/utente/fleet-control-server.git /opt/fleet-control-server
+git clone https://tuo-gitea.com/utente/fleet-control-server.git /opt/fleet-control-server
 cd /opt/fleet-control-server
 ```
 #### 2. Setup Ambiente Virtuale (Consigliato)
@@ -175,10 +175,10 @@ pip install -r requirements.txt
 #### 4. Esecuzione come Servizio (systemd)
 Per eseguire il server in produzione in modo continuo e stabile con Gunicorn:
 ```bash
-sudo cp fleet-console.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable fleet-console
-sudo systemctl start fleet-console
+cp fleet-console.service /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable fleet-console
+systemctl start fleet-console
 ```
 *(Assicurati che il file `.service` punti all'eseguibile `gunicorn` situato all'interno della cartella `venv`).*
 

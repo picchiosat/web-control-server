@@ -3,14 +3,21 @@
 ============================================================
 
 ------------------------------------------------------------
+0. IMPORTANT: ROOT PRIVILEGES
+------------------------------------------------------------
+All installation steps must be executed as the "root" user.
+Before starting, elevate your privileges by running:
+   sudo su
+
+------------------------------------------------------------
 1. PRE-REQUISITES (CRITICAL)
 ------------------------------------------------------------
 Before installing Python dependencies, you must install 
 system compilers, development libraries, and pip/venv tools.
 
 Debian/Ubuntu:
-   sudo apt update
-   sudo apt install build-essential python3-dev libssl-dev libffi-dev python3-pip python3-venv
+   apt update
+   apt install build-essential python3-dev libssl-dev libffi-dev python3-pip python3-venv
 
 Create and activate a virtual environment (CRITICAL on Debian 12+):
    cd /opt/fleet-control-server
@@ -62,13 +69,20 @@ ExecStart=/opt/fleet-control-server/venv/bin/gunicorn -k ...
 Configuration:
 1. Copy .service file to '/etc/systemd/system/':
    sudo cp fleet-console.service /etc/systemd/system/
-2. Reload systemd: sudo systemctl daemon-reload
-3. Enable on boot: sudo systemctl enable fleet-console
-4. Start service:  sudo systemctl start fleet-console
+2. Reload systemd: systemctl daemon-reload
+3. Enable on boot: systemctl enable fleet-console
+4. Start service:  systemctl start fleet-console
 
 ============================================================
        GUIDA ALL'INSTALLAZIONE - SERVER (ITALIANO)
 ============================================================
+
+------------------------------------------------------------
+0. IMPORTANTE: PRIVILEGI DI ROOT
+------------------------------------------------------------
+Tutti i passaggi di installazione devono essere eseguiti 
+come utente "root". Prima di iniziare, eleva i tuoi privilegi:
+   sudo su
 
 ------------------------------------------------------------
 1. REQUISITI PRELIMINARI (CRITICI)
@@ -123,6 +137,6 @@ ExecStart=/opt/fleet-control-server/venv/bin/gunicorn -k ...
 
 Passaggi:
 1. Copia il file in systemd: sudo cp fleet-console.service /etc/systemd/system/
-2. Ricarica la configurazione: sudo systemctl daemon-reload
-3. Abilita all'avvio: sudo systemctl enable fleet-console
-4. Avvia il servizio: sudo systemctl start fleet-console
+2. Ricarica la configurazione: systemctl daemon-reload
+3. Abilita all'avvio: systemctl enable fleet-console
+4. Avvia il servizio: systemctl start fleet-console
