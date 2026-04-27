@@ -653,10 +653,12 @@
 
                         <div id="prof-btns-${c.id}" style="width: 100%; display: flex; gap: 10px; display: none;"></div>
                             
-                            <div style="width: 100%; display: flex; gap: 10px;">
+                            ${canControl ? `
+                            <div style="width: 100%; display: flex; gap: 10px; margin-bottom: 8px;">
                                 <button class="btn-cmd" style="background: var(--success);" title="${t('ttTgOn')}" onclick="sendTgCommand('${c.id}', 'TG:ON')">🔔 Telegram ON</button>
                                 <button class="btn-cmd" style="background: var(--text-muted);" title="${t('ttTgOff')}" onclick="sendTgCommand('${c.id}', 'TG:OFF')">🔇 Telegram OFF</button>
                             </div>
+                            ` : ''}
                             ${showReboot ? `
                             <div style="width: 100%; display: flex; gap: 8px;">
                                 <button id="btn-svc-${c.id}" class="btn-cmd" style="background: #334155; padding: 8px 4px;" title="${t('ttSvc')}" onclick="openServicesModal('${c.id}')">${t('btnSvc')}</button>
