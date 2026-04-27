@@ -20,6 +20,7 @@ telemetry_cache.json
 
 # Ignora log di sistema eventuali
 *.log
+*.log.*
 
 # Ignora le configurazioni reali dell'agente remoto
 *.ini
