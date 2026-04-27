@@ -334,16 +334,17 @@ def on_message(client, userdata, msg):
             except Exception as e:
                 logger.error(f"Error parsing MMDVMHost info for {cid}: {e}")
 
-        # --- MMDVMHOST GENERAL MANAGEMENT (CALLSIGN & ID) ---
+        # --- MMDVMHOST GENERAL MANAGEMENT (CALLSIGN & ID & DUPLEX) ---
         elif len(parts) >= 4 and parts[0] == 'data' and parts[2].lower() == 'mmdvmhost' and parts[3].lower() == 'general':
             try:
                 cid = parts[1].lower()
                 data = json.loads(payload)
                 callsign = data.get("Callsign", "")
                 radio_id = data.get("Id", "")
+                duplex = data.get("Duplex", "1") # 1 = Repeater, 0 = Simplex
                 
                 if callsign:
-                    node_general[cid] = {"callsign": callsign, "radio_id": radio_id}
+                    node_general[cid] = {"callsign": callsign, "radio_id": radio_id, "duplex": str(duplex)}
                     socketio.emit('dati_aggiornati')
             except Exception as e:
                 logger.error(f"Error parsing MMDVMHost general for {cid}: {e}")

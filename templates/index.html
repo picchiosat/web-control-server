@@ -56,6 +56,28 @@
         .node-meta { font-size: 0.75rem; color: #8b949e; text-align: center; margin-bottom: 15px; line-height: 1.4; }
         .node-meta-item { display: block; }
 
+        /* --- Badge Tipo Nodo --- */
+        .type-badge {
+           font-size: 0.65rem;
+           padding: 2px 6px;
+           border-radius: 4px;
+           font-weight: 700;
+           text-transform: uppercase;
+           display: inline-block;
+           margin-left: 8px;
+           vertical-align: middle;
+        }
+        .type-repeater { 
+           background: rgba(47, 129, 247, 0.15); 
+           color: var(--primary); 
+           border: 1px solid var(--primary); 
+        }
+        .type-hotspot { 
+           background: rgba(163, 113, 247, 0.15); 
+           color: var(--accent); 
+           border: 1px solid var(--accent); 
+        }
+
         /* Display Stato */
         .status-display { text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 700; padding: 8px; border-radius: 3px; background: #010409; border: 1px solid var(--border-color); margin-bottom: 15px; color: var(--text-muted); }
         .card.online .status-display { color: var(--success); border-color: rgba(46, 160, 67, 0.4); }
@@ -595,7 +617,10 @@
                         <div class="card" id="card-${c.id}">
                         <div class="card-header">
                             <span class="client-name" title="${c.name}">${c.name}</span>
-                            <span class="badge-id">ID: ${c.id.toUpperCase()}</span>
+                            <div style="display: flex; align-items: center;">
+                                <span class="badge-id">ID: ${c.id.toUpperCase()}</span>
+                                <div id="type-badge-${c.id}" class="type-badge" style="display: none;"></div>
+                            </div>
                         </div>
                         <div class="freq-bar" id="freq-container-${c.id}" style="display: none;">
                             <span><span class="freq-tx">TX:</span> <span id="freq-tx-${c.id}">...</span></span>
@@ -680,19 +705,34 @@
                 let genObj = data.general && data.general[c.id.toLowerCase()];
                 const nameSpan = cardDiv.querySelector('.client-name');
                 const idBadge = cardDiv.querySelector('.badge-id');
+                const typeBadge = document.getElementById(`type-badge-${c.id}`); // <--- Peschiamo il nostro nuovo badge
 
                 if (genObj && isOnline) {
                     nameSpan.innerText = genObj.callsign;
                     idBadge.innerText = `ID: ${genObj.radio_id}`;
                     idBadge.style.background = "var(--primary)"; 
-                    idBadge.style.color = "#ffffff"; // <--- FORZA IL TESTO BIANCO
-                    idBadge.style.borderColor = "var(--primary)"; // <--- ADATTA IL BORDO
+                    idBadge.style.color = "#ffffff"; 
+                    idBadge.style.borderColor = "var(--primary)"; 
+                    
+                    // --- LOGICA BADGE HOTSPOT/REPEATER ---
+                    if (typeBadge && genObj.duplex !== undefined) {
+                        typeBadge.style.display = 'inline-block';
+                        if (genObj.duplex === "1") {
+                            typeBadge.innerText = "REPEATER";
+                            typeBadge.className = "type-badge type-repeater";
+                        } else {
+                            typeBadge.innerText = "HOTSPOT";
+                            typeBadge.className = "type-badge type-hotspot";
+                        }
+                    }
                 } else {
                     nameSpan.innerText = c.name;
                     idBadge.innerText = `ID: ${c.id.toUpperCase()}`;
                     idBadge.style.background = "rgba(255,255,255,0.1)";
-                    idBadge.style.color = "var(--text-muted)"; // <--- RIPRISTINA IL GRIGIO
+                    idBadge.style.color = "var(--text-muted)"; 
                     idBadge.style.borderColor = "var(--border-color)";
+                    
+                    if (typeBadge) typeBadge.style.display = 'none'; // Nascondilo se il nodo va offline
                 }
 
                 // 3. TELEMETRIA E STATO (PULITO DAI DUPLICATI)
@@ -725,8 +765,17 @@
                     let netObj = data.networks && data.networks[c.id.toLowerCase()] ? data.networks[c.id.toLowerCase()] : {ts1: "", ts2: ""};
                     activeModeColor = "var(--primary)";
                     
-                    if (ts1Div && ts2Div) {
+                if (ts1Div && ts2Div) {
+                        // --- LOGICA DUPLEX / SIMPLEX ---
+                        let isSimplex = (genObj && genObj.duplex === "0");
+                        
+                        // Nascondiamo il div del TS1 se il nodo è Simplex
+                        ts1Div.style.display = isSimplex ? 'none' : 'block';
+
                         [ts1Div, ts2Div].forEach((div, idx) => {
+                            // Se è simplex, saltiamo del tutto l'aggiornamento grafico del TS1
+                            if (isSimplex && idx === 0) return;
+
                             const val = idx === 0 ? telemetryObj.ts1 : telemetryObj.ts2; const netName = idx === 0 ? netObj.ts1 : netObj.ts2;
                             const fullLabel = netName ? `TS${idx + 1} [${netName}]` : `TS${idx + 1}`;
                             div.innerText = `${fullLabel}: ${val}`;
