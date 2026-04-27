@@ -335,12 +335,13 @@
     <div class="modal-content" style="width:90%; max-width:400px; text-align:center;">
         <h2 style="margin-top:0; color:var(--danger);">🚨 <span data-i18n="titleGlobal">GLOBAL OVERRIDE</span> 🚨</h2>
         <p style="margin-bottom:25px; color:var(--text-muted); font-weight: 600;" id="override-desc">Select the profile to send to the ENTIRE network:</p>
-        <div style="display:flex; flex-direction:column; gap:15px;">
-            <button id="btn-global-A" onclick="sendGlobalAction('A')" class="btn-cmd" style="background:var(--accent); padding:15px; font-size:1.1rem;">PROFILE A</button>
-            <button id="btn-global-B" onclick="sendGlobalAction('B')" class="btn-cmd" style="background:#eab308; padding:15px; font-size:1.1rem;">PROFILE B</button>
-            <button onclick="document.getElementById('override-modal').style.display='none'" class="btn-cmd" style="background:var(--text-muted); padding:12px; margin-top:10px;" data-i18n="btnCancel">CANCEL</button>
-        </div>
+        
+        <div id="global-btn-container" style="display:flex; flex-direction:column; gap:15px; margin-bottom: 15px;"></div>
+        
+        <button onclick="document.getElementById('override-modal').style.display='none'" class="btn-cmd" style="background:var(--text-muted); padding:12px; width:100%;" data-i18n="btnCancel">CANCEL</button>
     </div>
+</div>
+
 </div>
 
 <div id="reset-hat-modal" class="modal-overlay">
@@ -625,19 +626,19 @@
                             <span style="font-size: 0.85rem;" data-i18n="warnDaemon">${t('warnDaemon')}</span>
                         </div>
 
-                        <div class="actions" style="${(isAuthenticated && canControl) ? 'display:flex;' : 'display:none'}">
-                            <button id="btn-profA-${c.id}" class="btn-cmd" style="background: var(--accent);" title="${t('ttProfA')}" onclick="confirmSwitch('${c.id}', 'A')">PROFILE A</button>
-                            <button id="btn-profB-${c.id}" class="btn-cmd" style="background: #eab308;" title="${t('ttProfB')}" onclick="confirmSwitch('${c.id}', 'B')">PROFILE B</button>
+                        <div id="prof-btns-${c.id}" style="width: 100%; display: flex; gap: 10px; display: none;"></div>
                             
                             <div style="width: 100%; display: flex; gap: 10px;">
                                 <button class="btn-cmd" style="background: var(--success);" title="${t('ttTgOn')}" onclick="sendTgCommand('${c.id}', 'TG:ON')">🔔 Telegram ON</button>
                                 <button class="btn-cmd" style="background: var(--text-muted);" title="${t('ttTgOff')}" onclick="sendTgCommand('${c.id}', 'TG:OFF')">🔇 Telegram OFF</button>
                             </div>
                             ${showReboot ? `
-                            <button id="btn-svc-${c.id}" class="btn-cmd" style="background: #334155;" title="${t('ttSvc')}" onclick="openServicesModal('${c.id}')">${t('btnSvc')}</button>
-                            <button class="btn-cmd" style="background: #8e44ad;" title="${t('ttFile')}" onclick="openConfigsModal('${c.id}')">${t('btnFile')}</button>
-                            <button class="btn-cmd" style="background: #ea580c;" title="${t('ttHat')}" onclick="confirmHatReset('${c.id}')">${t('btnHat')}</button>
-                            <button class="btn-cmd" style="background: var(--danger);" title="${t('ttBoot')}" onclick="confirmReboot('${c.id}')">${t('btnBoot')}</button>
+                            <div style="width: 100%; display: flex; gap: 8px;">
+                                <button id="btn-svc-${c.id}" class="btn-cmd" style="background: #334155; padding: 8px 4px;" title="${t('ttSvc')}" onclick="openServicesModal('${c.id}')">${t('btnSvc')}</button>
+                                <button class="btn-cmd" style="background: #8e44ad; padding: 8px 4px;" title="${t('ttFile')}" onclick="openConfigsModal('${c.id}')">${t('btnFile')}</button>
+                                <button class="btn-cmd" style="background: #ea580c; padding: 8px 4px;" title="${t('ttHat')}" onclick="confirmHatReset('${c.id}')">${t('btnHat')}</button>
+                                <button class="btn-cmd" style="background: var(--danger); padding: 8px 4px;" title="${t('ttBoot')}" onclick="confirmReboot('${c.id}')">${t('btnBoot')}</button>
+                            </div>
                             ` : ''}
                         </div>
                     </div>`;
@@ -772,10 +773,28 @@
                     let tempVal = healthObj.temp; tempSpan.innerText = tempVal; tempSpan.style.color = tempVal < 55 ? 'var(--success)' : (tempVal < 70 ? '#f59e0b' : 'var(--danger)');
                     ramSpan.innerText = healthObj.ram; let d = healthObj.disk; diskSpan.innerText = d; diskSpan.style.color = d < 85 ? 'inherit' : (d < 95 ? '#f59e0b' : 'var(--danger)');
                     
-                    let profA = (healthObj.profiles && healthObj.profiles.A) ? healthObj.profiles.A : "PROFILE A"; let profB = (healthObj.profiles && healthObj.profiles.B) ? healthObj.profiles.B : "PROFILE B";
-                    const btnA = document.getElementById(`btn-profA-${c.id}`); const btnB = document.getElementById(`btn-profB-${c.id}`);
-                    if (btnA) { btnA.innerText = profA; btnA.title = `${t('ttSwitchTo')}${profA}`; }
-                    if (btnB) { btnB.innerText = profB; btnB.title = `${t('ttSwitchTo')}${profB}`; }
+                const profBtnsDiv = document.getElementById(`prof-btns-${c.id}`);
+                    const profKeys = JSON.stringify(healthObj.profiles || {});
+                    
+                    if (profBtnsDiv && profBtnsDiv.dataset.keys !== profKeys) {
+                        profBtnsDiv.dataset.keys = profKeys;
+                        if (healthObj.profiles && Object.keys(healthObj.profiles).length > 0) {
+                            profBtnsDiv.style.display = 'flex';
+                            let html = '';
+                            const colors = ["var(--accent)", "#eab308", "var(--success)", "var(--primary)"];
+                            let idx = 0;
+                            for (const [pKey, pLabel] of Object.entries(healthObj.profiles)) {
+                                let col = colors[idx % colors.length];
+                                html += `<button class="btn-cmd" style="background: ${col}; flex: 1;" title="${t('ttSwitchTo')}${pLabel}" onclick="confirmSwitch('${c.id}', '${pKey}')">${pLabel}</button>`;
+                                idx++;
+                            }
+                            profBtnsDiv.innerHTML = html;
+                        } else {
+                            profBtnsDiv.style.display = 'none';
+                            profBtnsDiv.innerHTML = '';
+                        }
+                    }
+
                 } else { if (healthContainer) healthContainer.style.display = 'none'; }
 
                 globalHealthData[c.id.toLowerCase()] = healthObj;
@@ -901,9 +920,34 @@
     
     // --- SETTINGS ---
     function triggerGlobalEmergency() {
-        let nameA = "PROFILE A"; let nameB = "PROFILE B";
-        for (const id in globalHealthData) { if (globalHealthData[id] && globalHealthData[id].profiles) { nameA = globalHealthData[id].profiles.A || nameA; nameB = globalHealthData[id].profiles.B || nameB; break; } }
-        document.getElementById('btn-global-A').innerText = nameA; document.getElementById('btn-global-B').innerText = nameB; document.getElementById('override-desc').innerText = t('msgOvrSel'); document.getElementById('override-modal').style.display = 'flex';
+        let uniqueProfiles = {};
+        // Raccoglie tutti i profili unici trovati nei nodi online
+        for (const id in globalHealthData) { 
+            if (globalHealthData[id] && globalHealthData[id].profiles) { 
+                for (const [k, v] of Object.entries(globalHealthData[id].profiles)) {
+                    uniqueProfiles[k] = v;
+                }
+            } 
+        }
+        
+        const container = document.getElementById('global-btn-container');
+        let html = '';
+        const colors = ["var(--accent)", "#eab308", "var(--success)", "var(--primary)"];
+        let idx = 0;
+        
+        for (const [k, v] of Object.entries(uniqueProfiles)) {
+            let col = colors[idx % colors.length];
+            html += `<button onclick="sendGlobalAction('${k}')" class="btn-cmd" style="background:${col}; padding:15px; font-size:1.1rem; font-weight:bold;">${v}</button>`;
+            idx++;
+        }
+        
+        if (Object.keys(uniqueProfiles).length === 0) {
+            html = `<p style="color:var(--danger); font-weight:bold;">No profiles configured on the network.</p>`;
+        }
+        
+        container.innerHTML = html;
+        document.getElementById('override-desc').innerText = t('msgOvrSel'); 
+        document.getElementById('override-modal').style.display = 'flex';
     }
 
     function sendGlobalAction(action) {
