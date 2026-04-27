@@ -211,10 +211,17 @@ def on_message(client, userdata, msg):
         payload = msg.payload.decode().strip()
         parts = topic.split('/')
         if len(parts) < 2: return
+        
         cid = parts[1].lower()
+        
+        # --- MAGIA DELLA NORMALIZZAZIONE ---
+        # Prendiamo i blocchi del topic, li facciamo minuscoli e togliamo i trattini
+        # Così "DMRGateway", "dmr-gateway" e "dmrgateway" diventano tutti identici per noi
+        p0 = parts[0].lower().replace('-', '')
+        p2 = parts[2].lower().replace('-', '') if len(parts) > 2 else ""
 
         # --- CAPTURE FULL CONFIGURATIONS ---
-        if parts[0] == 'data' and len(parts) >= 4 and parts[3] == 'full_config':
+        if p0 == 'data' and len(parts) >= 4 and parts[3].lower() == 'full_config':
             cid_conf = parts[1].lower()
             svc_name = parts[2].lower()
             if cid_conf not in device_configs:
@@ -226,7 +233,7 @@ def on_message(client, userdata, msg):
                 logger.error(f"Error parsing config JSON: {e}")
 
         # --- NODE AND SERVICE STATE MANAGEMENT ---
-        elif parts[0] == 'servizi':
+        elif p0 == 'servizi':
             client_states[cid] = payload
             socketio.emit('dati_aggiornati')  # <--- WEBSOCKET
             
@@ -247,7 +254,7 @@ def on_message(client, userdata, msg):
                     save_cache(client_telemetry)
 
         # --- DEVICE HEALTH MANAGEMENT ---
-        elif parts[0] == 'devices' and len(parts) >= 3 and parts[2] == 'services':
+        elif p0 == 'devices' and len(parts) >= 3 and p2 == 'services':
             try:
                 data = json.loads(payload)
                 device_health[cid] = {
@@ -281,7 +288,7 @@ def on_message(client, userdata, msg):
                 logger.error(f"Error parsing health data: {e}")
 
         # --- DMR GATEWAY MANAGEMENT ---
-        elif len(parts) >= 4 and parts[0] == 'data' and parts[2].lower() == 'dmrgateway' and (parts[3].upper().startswith('NETWORK') or parts[3].upper().startswith('DMR NETWORK')):
+        elif len(parts) >= 4 and p0 == 'data' and p2 == 'dmrgateway' and (parts[3].upper().startswith('NETWORK') or parts[3].upper().startswith('DMR NETWORK')):
             try:
                 cid = parts[1].lower()
                 data = json.loads(payload)
@@ -308,7 +315,7 @@ def on_message(client, userdata, msg):
                 logger.error(f"Error parsing DMRGateway for {cid}: {e}")
 
         # --- MMDVMHOST INFO MANAGEMENT (FREQUENZE & LOCATION) ---
-        elif len(parts) >= 4 and parts[0] == 'data' and parts[2].lower() == 'mmdvmhost' and parts[3].lower() == 'info':
+        elif len(parts) >= 4 and p0 == 'data' and p2 == 'mmdvmhost' and parts[3].lower() == 'info':
             try:
                 cid = parts[1].lower()
                 data = json.loads(payload)
@@ -320,13 +327,11 @@ def on_message(client, userdata, msg):
                 lon = data.get("Longitude", "0.0")
                 loc = data.get("Location", "Sconosciuta")
                 
-                # Funzione per formattare gli Hz in MHz
                 def format_freq(f):
                     if str(f).isdigit() and int(f) > 0:
                         return f"{int(f)/1000000:.3f} MHz"
                     return str(f)
                     
-                # Salvataggio nel dizionario globale
                 node_info[cid] = {
                     "tx": format_freq(tx), 
                     "rx": format_freq(rx),
@@ -339,7 +344,7 @@ def on_message(client, userdata, msg):
                 logger.error(f"Error parsing MMDVMHost info for {cid}: {e}")
 
         # --- MMDVMHOST GENERAL MANAGEMENT (CALLSIGN & ID & DUPLEX) ---
-        elif len(parts) >= 4 and parts[0] == 'data' and parts[2].lower() == 'mmdvmhost' and parts[3].lower() == 'general':
+        elif len(parts) >= 4 and p0 == 'data' and p2 == 'mmdvmhost' and parts[3].lower() == 'general':
             try:
                 cid = parts[1].lower()
                 data = json.loads(payload)
@@ -354,13 +359,13 @@ def on_message(client, userdata, msg):
                 logger.error(f"Error parsing MMDVMHost general for {cid}: {e}")
 
         # --- OTHER GATEWAYS MANAGEMENT ---
-        elif parts[0] in ['dmr-gateway', 'nxdn-gateway', 'ysf-gateway', 'p25-gateway', 'dstar-gateway']:
+        elif p0 in ['dmrgateway', 'nxdngateway', 'ysfgateway', 'p25gateway', 'dstargateway']:
             data = json.loads(payload)
             proto = "DMR"
-            if "nxdn" in parts[0]: proto = "NXDN"
-            elif "ysf" in parts[0]: proto = "YSF"
-            elif "p25" in parts[0]: proto = "P25"
-            elif "dstar" in parts[0]: proto = "D-STAR"
+            if "nxdn" in p0: proto = "NXDN"
+            elif "ysf" in p0: proto = "YSF"
+            elif "p25" in p0: proto = "P25"
+            elif "dstar" in p0: proto = "D-STAR"
             
             m = ""
             if 'status' in data: 
