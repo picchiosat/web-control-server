@@ -4,7 +4,19 @@
         "port": 1883,
         "user": "your_username",
         "password": "your_password",
-    "client_id": "fleet_backend_prod"
+        "client_id": "fleet_backend_prod",
+        "topics": [
+            "servizi/+/stat",
+            "dmr-gateway/+/json",
+            "devices/+/services",
+            "nxdn-gateway/+/json",
+            "ysf-gateway/+/json",
+            "p25-gateway/+/json",
+            "dstar-gateway/+/json",
+            "mmdvm/+/json",
+            "devices/#",
+            "data/#"
+        ]
     },
     "web_admin": {
         "default_user": "admin",

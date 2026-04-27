@@ -172,18 +172,22 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
         logger.info("✅ Successfully connected to MQTT Broker! Subscribing to topics...")
         # Invia lo stato Online ai client web
         socketio.emit('mqtt_status', {'connected': True})
-        client.subscribe([
-            ("servizi/+/stat", 0), 
-            ("dmr-gateway/+/json", 0), 
-            ("devices/+/services", 0), 
-            ("nxdn-gateway/+/json", 0), 
-            ("ysf-gateway/+/json", 0), 
-            ("p25-gateway/+/json", 0), 
-            ("dstar-gateway/+/json", 0), 
-            ("mmdvm/+/json", 0), 
-            ("devices/#", 0), 
-            ("data/#", 0)
-        ])
+        
+        # --- LETTURA DINAMICA DEI TOPIC ---
+        default_topics = [
+            "servizi/+/stat", "dmr-gateway/+/json", "devices/+/services",
+            "nxdn-gateway/+/json", "ysf-gateway/+/json", "p25-gateway/+/json",
+            "dstar-gateway/+/json", "mmdvm/+/json", "devices/#", "data/#"
+        ]
+        
+        # Cerca la lista "topics" nel config.json, se non la trova usa quella di default
+        topics_list = config.get('mqtt', {}).get('topics', default_topics)
+        
+        # Converte la lista di stringhe nel formato richiesto da paho-mqtt: [(topic, qos), (topic, qos)...]
+        subscribe_list = [(topic, 0) for topic in topics_list]
+        
+        client.subscribe(subscribe_list)
+        logger.info(f"Subscribed to {len(subscribe_list)} MQTT topics.")
     else:
         mqtt_connected_status = False
         socketio.emit('mqtt_status', {'connected': False})
